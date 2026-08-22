@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ParanoidMatrix Keyboard</string>
+    <string name="ime_name">ParanoidMatrix IME</string>
+    <string name="subtype_en">English (Matrix)</string>
+    <string name="subtype_ru">Русский (Матрица)</string>
+    <string name="settings_title">Настройки ParanoidMatrix</string>
+    <string name="pref_haptic_title">Тактильный отклик</string>
+    <string name="pref_haptic_summary">Вибрация при нажатии клавиш</string>
+    <string name="pref_sound_title">Звук нажатия</string>
+    <string name="pref_sound_summary">Воспроизводить звук клавиатуры</string>
+    <string name="pref_theme_title">Тема</string>
+    <string name="pref_theme_summary">Выбор цветовой схемы клавиатуры</string>
+    <string name="pref_lang_title">Языки</string>
+    <string name="pref_lang_summary">Управление доступными языками</string>
+    <string name="pref_security_title">Безопасность</string>
+    <string name="pref_security_summary">Настройки приватности ввода</string>
+    <string name="pref_no_logging">Не логировать нажатия</string>
+    <string name="pref_no_logging_summary">Никогда не сохранять историю ввода</string>
+    <string name="pref_incognito">Режим инкогнито</string>
+    <string name="pref_incognito_summary">Отключить предсказания и кэш</string>
+</resources>

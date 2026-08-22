@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="theme_entries">
+        <item>Matrix Green (Classic)</item>
+        <item>Matrix Amber (Retro)</item>
+        <item>Matrix Blue (Cyber)</item>
+        <item>Matrix Red (Alert)</item>
+        <item>Stealth Dark (No glow)</item>
+    </string-array>
+    <string-array name="theme_values">
+        <item>matrix_green</item>
+        <item>matrix_amber</item>
+        <item>matrix_blue</item>
+        <item>matrix_red</item>
+        <item>stealth_dark</item>
+    </string-array>
+
+    <string-array name="lang_entries">
+        <item>English (Latin)</item>
+        <item>Русский (Кириллица)</item>
+        <item>Deutsch (QWERTZ)</item>
+        <item>Español</item>
+        <item>Français (AZERTY)</item>
+        <item>中文 (Pinyin)</item>
+    </string-array>
+    <string-array name="lang_values">
+        <item>en</item>
+        <item>ru</item>
+        <item>de</item>
+        <item>es</item>
+        <item>fr</item>
+        <item>zh</item>
+    </string-array>
+    <string-array name="lang_default">
+        <item>en</item>
+        <item>ru</item>
+    </string-array>
+</resources>

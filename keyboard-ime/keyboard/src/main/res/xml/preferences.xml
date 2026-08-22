@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/pref_security_title">
+        <SwitchPreferenceCompat
+            android:key="pref_no_logging"
+            android:title="@string/pref_no_logging"
+            android:summary="@string/pref_no_logging_summary"
+            android:defaultValue="true" />
+        <SwitchPreferenceCompat
+            android:key="pref_incognito"
+            android:title="@string/pref_incognito"
+            android:summary="@string/pref_incognito_summary"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Ввод">
+        <SwitchPreferenceCompat
+            android:key="pref_haptic"
+            android:title="@string/pref_haptic_title"
+            android:summary="@string/pref_haptic_summary"
+            android:defaultValue="true" />
+        <SwitchPreferenceCompat
+            android:key="pref_sound"
+            android:title="@string/pref_sound_title"
+            android:summary="@string/pref_sound_summary"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_theme_title">
+        <ListPreference
+            android:key="pref_theme"
+            android:title="@string/pref_theme_title"
+            android:summary="@string/pref_theme_summary"
+            android:entries="@array/theme_entries"
+            android:entryValues="@array/theme_values"
+            android:defaultValue="matrix_green" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_lang_title">
+        <MultiSelectListPreference
+            android:key="pref_languages"
+            android:title="Доступные языки"
+            android:summary="Выберите языки для переключения"
+            android:entries="@array/lang_entries"
+            android:entryValues="@array/lang_values"
+            android:defaultValue="@array/lang_default" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
