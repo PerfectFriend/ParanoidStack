@@ -1,0 +1,42 @@
+{
+  "domains": [
+    {
+      "domain": "www.google.com",
+      "weight": 100,
+      "description": "Google (high availability, widely allowed)"
+    },
+    {
+      "domain": "www.cloudflare.com",
+      "weight": 90,
+      "description": "Cloudflare (high availability, widely allowed)"
+    },
+    {
+      "domain": "www.microsoft.com",
+      "weight": 80,
+      "description": "Microsoft (widely allowed in corporate networks)"
+    },
+    {
+      "domain": "www.amazon.com",
+      "weight": 70,
+      "description": "Amazon (widely allowed)"
+    },
+    {
+      "domain": "www.github.com",
+      "weight": 60,
+      "description": "GitHub (developer-friendly, often allowed)"
+    },
+    {
+      "domain": "cdn.jsdelivr.net",
+      "weight": 50,
+      "description": "jsDelivr CDN (often allowed)"
+    },
+    {
+      "domain": "unpkg.com",
+      "weight": 40,
+      "description": "unpkg CDN (often allowed)"
+    }
+  ],
+  "selectionStrategy": "weighted-random",
+  "rotationIntervalMinutes": 30,
+  "fallbackDomain": "www.google.com"
+}

@@ -471,6 +471,7 @@ class SnowflakeBridge(
         scope.launch {
             try {
                 val transport = com.nexuschat.app.services.SnowflakeTransport(
+                    ctx,
                     onDataReceived = { data ->
                         val b64 = Base64.encodeToString(data, Base64.NO_WRAP)
                         val safe = com.google.gson.Gson().toJson(b64)

@@ -169,7 +169,7 @@ class BinaryDownloader private constructor(private val ctx: Context) {
         val actualHash = digest.digest().joinToString("") { "%02x".format(it) }
         val match = actualHash == expectedHash
         if (!match) Log.w(TAG, "Hash mismatch for ${file.name}: expected=$expectedHash actual=$actualHash")
-        match
+        return match
     }
 
     private fun downloadFile(sourceUrl: String, dest: File, progress: ((BinaryType, Int, Int) -> Unit)? = null) {

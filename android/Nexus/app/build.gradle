@@ -98,7 +98,7 @@ android {
                 doLast {
                     copy {
                         from variant.outputs.first().outputFile
-                        into 'C:/ApkExport'
+                        into '/home/thomas/ApkExport'
                         rename '.*', 'Nexus.apk'
                     }
                 }

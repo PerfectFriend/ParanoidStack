@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  v2ray:
+    image: teddysun/xray:latest
+    container_name: ParanoidX-v2ray
+    restart: unless-stopped
+    env_file:
+      - ./v2ray/.env
+    ports:
+      - "10808:10808"  # SOCKS5
+      - "10809:10809"  # HTTP
+      - "10810:10810"  # VLESS-REALITY
+    volumes:
+      - ./v2ray/config.json:/etc/xray/config.json:ro
+    healthcheck:
+      test: ["CMD", "xray", "version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  tor:
+    build:
+      context: ./tor
+      dockerfile: Dockerfile
+    container_name: ParanoidX-tor
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "tor", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    volumes:
+      - ./tor/torrc:/etc/tor/torrc:ro
+      - ./tor/hidden_services/smp:/var/lib/tor/smp
+      - ./tor/hidden_services/xftp:/var/lib/tor/xftp
+      - ./tor/hidden_services/dashboard:/var/lib/tor/dashboard
+      - ./tor/hidden_services/ice:/var/lib/tor/ice
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  smp-server:
+    image: simplexchat/smp-server:v7.0.1.0
+    container_name: ParanoidX-smp-server
+    restart: unless-stopped
+    user: "1000:1000"
+    command: -c /etc/simplex/smp-server.ini --log-file=stdout
+    volumes:
+      - ./smp_configs:/etc/simplex
+      - ./smp_state:/var/opt/simplex
+    depends_on:
+      - tor
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /proc/1/cmdline && cat /proc/1/cmdline | tr '\\0' ' ' | grep -q smp-server"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  xftp-server:
+    image: simplexchat/xftp-server:v7.0.1.0
+    container_name: ParanoidX-xftp-server
+    restart: unless-stopped
+    user: "1000:1000"
+    command: -c /etc/simplex-xftp/file-server.ini --log-file=stdout
+    volumes:
+      - ./xftp_configs:/etc/simplex-xftp
+      - ./xftp_state:/var/opt/simplex-xftp
+    depends_on:
+      - tor
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /proc/1/cmdline && cat /proc/1/cmdline | tr '\\0' ' ' | grep -q xftp-server"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  coturn:
+    image: coturn/coturn:latest
+    container_name: ParanoidX-coturn
+    restart: unless-stopped
+    user: "1000:1000"
+    command: -c /etc/coturn/turnserver.conf --log-file=stdout
+    env_file:
+      - ./coturn/.env
+    volumes:
+      - ./coturn/turnserver.conf:/etc/coturn/turnserver.conf:ro
+    depends_on:
+      - tor
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /proc/1/cmdline && cat /proc/1/cmdline | tr '\\0' ' ' | grep -q turnserver"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  default:
+    name: ParanoidX-network

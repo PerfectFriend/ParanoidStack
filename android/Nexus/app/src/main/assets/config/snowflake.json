@@ -1,0 +1,22 @@
+{
+  "brokerUrl": "https://snowflake-broker.torproject.net/",
+  "frontDomain": "snowflake.torproject.net",
+  "stunServers": [
+    "stun:stun.l.google.com:19302",
+    "stun:stun1.l.google.com:19302",
+    "stun:stun.cloudflare.com:3478",
+    "stun:stun.stunprotocol.org:3478"
+  ],
+  "clientConfig": {
+    "maxRetries": 3,
+    "retryDelayMs": 2000,
+    "connectionTimeoutMs": 30000,
+    "keepAliveIntervalMs": 15000
+  },
+  "proxyConfig": {
+    "enabled": false,
+    "type": "socks5",
+    "address": "",
+    "port": 0
+  }
+}

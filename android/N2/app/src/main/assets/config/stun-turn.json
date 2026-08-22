@@ -1,0 +1,43 @@
+{
+  "stun": [
+    {
+      "url": "stun:stun.l.google.com:19302",
+      "description": "Google STUN server (primary)"
+    },
+    {
+      "url": "stun:stun1.l.google.com:19302",
+      "description": "Google STUN server (secondary)"
+    },
+    {
+      "url": "stun:stun.cloudflare.com:3478",
+      "description": "Cloudflare STUN server"
+    },
+    {
+      "url": "stun:stun.stunprotocol.org:3478",
+      "description": "Public STUN server"
+    },
+    {
+      "url": "stun:stun.voipbuster.com:3478",
+      "description": "VoIP Buster STUN server"
+    }
+  ],
+  "turn": [
+    {
+      "url": "turn:turn.example.com:3478?transport=udp",
+      "username": "user",
+      "credential": "password",
+      "description": "Example TURN server (replace with real)"
+    },
+    {
+      "url": "turn:turn.example.com:5349?transport=tcp",
+      "username": "user",
+      "credential": "password",
+      "description": "Example TURN server over TLS (replace with real)"
+    }
+  ],
+  "defaults": {
+    "preferTurnOverStun": false,
+    "iceTransportPolicy": "all",
+    "gatheringTimeoutMs": 10000
+  }
+}

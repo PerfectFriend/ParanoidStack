@@ -1,0 +1,67 @@
+{
+  "obfs4": [
+    {
+      "address": "85.31.186.98",
+      "port": 443,
+      "fingerprint": "D2B4E4F9A660B6B5D4B7E1C9A2E3F8D0C1B4A9E8",
+      "args": {
+        "cert": "F5CB4E4F9A660B6B5D4B7E1C9A2E3F8D0C1B4A9E8",
+        "iat-mode": "0"
+      }
+    },
+    {
+      "address": "192.95.36.142",
+      "port": 443,
+      "fingerprint": "D2B4E4F9A660B6B5D4B7E1C9A2E3F8D0C1B4A9E8",
+      "args": {
+        "cert": "A5CB4E4F9A660B6B5D4B7E1C9A2E3F8D0C1B4A9E8",
+        "iat-mode": "0"
+      }
+    },
+    {
+      "address": "38.229.1.18",
+      "port": 80,
+      "fingerprint": "D2B4E4F9A660B6B5D4B7E1C9A2E3F8D0C1B4A9E8",
+      "args": {
+        "cert": "B5CB4E4F9A660B6B5D4B7E1C9A2E3F8D0C1B4A9E8",
+        "iat-mode": "0"
+      }
+    },
+    {
+      "address": "85.31.186.98",
+      "port": 443,
+      "fingerprint": "B2B4E4F9A660B6B5D4B7E1C9A2E3F8D0C1B4A9E8",
+      "args": {
+        "cert": "C5CB4E4F9A660B6B5D4B7E1C9A2E3F8D0C1B4A9E8",
+        "iat-mode": "1"
+      }
+    }
+  ],
+  "meek": [
+    {
+      "address": "meek.azureedge.net",
+      "port": 443,
+      "fingerprint": "D2B4E4F9A660B6B5D4B7E1C9A2E3F8D0C1B4A9E8",
+      "args": {
+        "front": "ajax.aspnetcdn.com",
+        "url": "https://meek.azureedge.net/"
+      }
+    }
+  ],
+  "snowflake": {
+    "brokerUrl": "https://snowflake-broker.torproject.net/",
+    "frontDomain": "snowflake.torproject.net",
+    "stunServers": [
+      "stun:stun.l.google.com:19302",
+      "stun:stun1.l.google.com:19302",
+      "stun:stun.cloudflare.com:3478"
+    ]
+  },
+  "webtunnel": [],
+  "autoFetch": {
+    "enabled": true,
+    "email": "",
+    "intervalHours": 24,
+    "fallbackToBuiltin": true
+  }
+}

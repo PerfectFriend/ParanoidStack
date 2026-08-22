@@ -1,0 +1,201 @@
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "port": 10808,
+      "listen": "0.0.0.0",
+      "protocol": "socks",
+      "settings": {
+        "auth": "noauth",
+        "udp": true,
+        "ip": "0.0.0.0"
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      },
+      "tag": "socks-in"
+    },
+    {
+      "port": 10809,
+      "listen": "0.0.0.0",
+      "protocol": "http",
+      "settings": {
+        "timeout": 0
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      },
+      "tag": "http-in"
+    },
+    {
+      "port": 10810,
+      "listen": "0.0.0.0",
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "${V2RAY_UUID}",
+            "flow": "xtls-rprx-vision",
+            "level": 0,
+            "email": "${V2RAY_EMAIL}"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "${REALITY_DEST}",
+          "xver": 0,
+          "serverNames": [
+            "${REALITY_SERVER_NAME}"
+          ],
+          "privateKey": "${REALITY_PRIVATE_KEY}",
+          "shortIds": [
+            "",
+            "${REALITY_SHORT_ID}"
+          ]
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      },
+      "tag": "vless-reality-in"
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "trojan",
+      "tag": "trojan-outbound-1",
+      "settings": {
+        "servers": [
+          {
+            "address": "${TROJAN_SERVER_1}",
+            "port": 443,
+            "password": "${TROJAN_PASSWORD}"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "wsSettings": {
+          "path": "${TROJAN_WS_PATH}"
+        },
+        "tlsSettings": {
+          "serverName": "${TROJAN_SERVER_NAME}",
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "protocol": "trojan",
+      "tag": "trojan-outbound-2",
+      "settings": {
+        "servers": [
+          {
+            "address": "${TROJAN_SERVER_2}",
+            "port": 443,
+            "password": "${TROJAN_PASSWORD}"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "wsSettings": {
+          "path": "${TROJAN_WS_PATH}"
+        },
+        "tlsSettings": {
+          "serverName": "${TROJAN_SERVER_NAME}",
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "protocol": "trojan",
+      "tag": "trojan-outbound-3",
+      "settings": {
+        "servers": [
+          {
+            "address": "${TROJAN_SERVER_3}",
+            "port": 443,
+            "password": "${TROJAN_PASSWORD}"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "wsSettings": {
+          "path": "${TROJAN_WS_PATH}",
+          "headers": {
+            "Host": "${TROJAN_SERVER_NAME}"
+          }
+        },
+        "tlsSettings": {
+          "serverName": "${TROJAN_SERVER_NAME}"
+        }
+      }
+    },
+    {
+      "protocol": "freedom",
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "block"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "inboundTag": [
+          "socks-in",
+          "http-in",
+          "vless-reality-in",
+          "vmess-ws-tls-in",
+          "trojan-tls-in",
+          "shadowsocks-in"
+        ],
+        "outboundTag": "trojan-outbound-1"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "geosite:category-ads-all"
+        ],
+        "outboundTag": "block"
+      }
+    ]
+  },
+  "dns": {
+    "servers": [
+      "https://1.1.1.1/dns-query",
+      "https://8.8.8.8/dns-query",
+      "localhost"
+    ],
+    "tag": "dns-out"
+  }
+}

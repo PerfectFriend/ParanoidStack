@@ -1,0 +1,60 @@
+{
+  "endpoints": [
+    {
+      "name": "tor-check-api",
+      "url": "https://check.torproject.org/api/ip",
+      "method": "GET",
+      "timeoutMs": 10000,
+      "expectedStatus": 200,
+      "validateJsonPath": "$.IsTor",
+      "description": "Official Tor Project IP check API"
+    },
+    {
+      "name": "tor-check-html",
+      "url": "https://check.torproject.org/",
+      "method": "HEAD",
+      "timeoutMs": 10000,
+      "expectedStatus": 200,
+      "description": "Tor Project check page (HEAD request)"
+    },
+    {
+      "name": "google-connectivity",
+      "url": "https://www.google.com/generate_204",
+      "method": "GET",
+      "timeoutMs": 5000,
+      "expectedStatus": 204,
+      "description": "Google connectivity check (returns 204 No Content)"
+    },
+    {
+      "name": "cloudflare-connectivity",
+      "url": "https://www.cloudflare.com/cdn-cgi/trace",
+      "method": "GET",
+      "timeoutMs": 5000,
+      "expectedStatus": 200,
+      "description": "Cloudflare connectivity trace"
+    },
+    {
+      "name": "smp-connectivity",
+      "url": "https://smp.simplex.chat:5223",
+      "method": "GET",
+      "timeoutMs": 10000,
+      "expectedStatus": 200,
+      "description": "SimpleX SMP server connectivity"
+    },
+    {
+      "name": "snowflake-broker",
+      "url": "https://snowflake-broker.torproject.net/",
+      "method": "GET",
+      "timeoutMs": 10000,
+      "expectedStatus": 200,
+      "description": "Snowflake broker health check"
+    }
+  ],
+  "schedule": {
+    "intervalMinutes": 15,
+    "runOnStartup": true,
+    "runOnNetworkChange": true
+  },
+  "failureThreshold": 3,
+  "fallbackToBuiltin": true
+}
