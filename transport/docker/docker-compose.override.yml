@@ -1,0 +1,22 @@
+# Override to add xray (v2ray) service
+services:
+  xray:
+    image: teddysun/xray:latest
+    container_name: ParanoidX-xray
+    restart: unless-stopped
+    volumes:
+      - ./v2ray/config.json:/etc/xray/config.json:ro
+      - ./v2ray/certs:/etc/xray/certs:ro
+    ports:
+      - "127.0.0.1:10808:10808"  # socks
+      - "127.0.0.1:10809:10809"  # http
+      - "127.0.0.1:10810:10810"  # vless-reality
+      - "127.0.0.1:10811:10811"  # vmess-ws-tls
+      - "127.0.0.1:10812:10812"  # trojan-tls
+      - "127.0.0.1:10813:10813"  # shadowsocks
+    healthcheck:
+      test: ["CMD", "xray", "version"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

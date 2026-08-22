@@ -1,0 +1,201 @@
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "port": 10808,
+      "listen": "0.0.0.0",
+      "protocol": "socks",
+      "settings": {
+        "auth": "noauth",
+        "udp": true,
+        "ip": "0.0.0.0"
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      },
+      "tag": "socks-in"
+    },
+    {
+      "port": 10809,
+      "listen": "0.0.0.0",
+      "protocol": "http",
+      "settings": {
+        "timeout": 0
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      },
+      "tag": "http-in"
+    },
+    {
+      "port": 10810,
+      "listen": "0.0.0.0",
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "0a7a1204-5450-4541-bbf9-54b3a3de6c51",
+            "flow": "xtls-rprx-vision",
+            "level": 0,
+            "email": "paranoidx-vless@stmaria.org"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "www.cloudflare.com:443",
+          "xver": 0,
+          "serverNames": [
+            "www.cloudflare.com"
+          ],
+          "privateKey": "-DMH4aSevNhVWXEonqKbMN9eN6Pw5AKFBAK51ilMgFY",
+          "shortIds": [
+            "",
+            "5402094c83d29a81"
+          ]
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      },
+      "tag": "vless-reality-in"
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "trojan",
+      "tag": "trojan-104.18.152.233-443",
+      "settings": {
+        "servers": [
+          {
+            "address": "104.18.152.233",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "wsSettings": {
+          "path": "/assignment"
+        },
+        "tlsSettings": {
+          "serverName": "www.ignitelimit.com",
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "protocol": "trojan",
+      "tag": "trojan-104.18.152.140-443",
+      "settings": {
+        "servers": [
+          {
+            "address": "104.18.152.140",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "wsSettings": {
+          "path": "/assignment"
+        },
+        "tlsSettings": {
+          "serverName": "www.ignitelimit.com",
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "protocol": "trojan",
+      "tag": "trojan-104.18.152.159-443",
+      "settings": {
+        "servers": [
+          {
+            "address": "104.18.152.159",
+            "port": 443,
+            "password": "humanity"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "wsSettings": {
+          "path": "/assignment",
+          "headers": {
+            "Host": "www.ignitelimit.com"
+          }
+        },
+        "tlsSettings": {
+          "serverName": "www.ignitelimit.com"
+        }
+      }
+    },
+    {
+      "protocol": "freedom",
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "block"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "inboundTag": [
+          "socks-in",
+          "http-in",
+          "vless-reality-in",
+          "vmess-ws-tls-in",
+          "trojan-tls-in",
+          "shadowsocks-in"
+        ],
+        "outboundTag": "trojan-104.18.152.233-443"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "geosite:category-ads-all"
+        ],
+        "outboundTag": "block"
+      }
+    ]
+  },
+  "dns": {
+    "servers": [
+      "https://1.1.1.1/dns-query",
+      "https://8.8.8.8/dns-query",
+      "localhost"
+    ],
+    "tag": "dns-out"
+  }
+}

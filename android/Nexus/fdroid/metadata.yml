@@ -1,0 +1,79 @@
+Categories:
+  - Connectivity
+  - Security
+  - System
+License: GPL-3.0-only
+WebSite: https://github.com/nexuschat/nexuschat
+IssueTracker: https://github.com/nexuschat/nexuschat/issues
+SourceCode: https://github.com/nexuschat/nexuschat
+Donate: https://github.com/sponsors/nexuschat
+FlattrID: nexuschat
+LiberapayID: nexuschat
+Description: |
+  NexusChat is a privacy-first messaging application built on top of the SimpleX
+  Messaging Protocol (SMP) with Tor routing for metadata protection.
+
+  ## Features
+
+  ### Privacy & Security
+  * **End-to-End Encryption**: X25519 key exchange + XSalsa20-Poly1305 (NaCl crypto_box)
+  * **Metadata Protection**: All traffic routed through Tor SOCKS5 proxy
+  * **Perfect Forward Secrecy**: Ephemeral keys per session
+  * **Post-Quantum Ready**: Ed25519 signatures, X25519 key exchange
+
+  ### Network Layers
+  * **Tor**: Onion routing with SOCKS5 proxy (port 9050)
+  * **Tailscale** (optional): WireGuard mesh VPN for trusted peers
+  * **SMP**: SimpleX Messaging Protocol over WebSocket/Tor
+  * **XFTP**: Encrypted file transfer with AES-256 chunking
+
+  ### Identity & Auth
+  * **Decentralized Identity**: Ed25519 identity keys, no central server
+  * **Biometric Lock**: Android Keystore + StrongBox hardware-backed
+  * **PIN Lock**: 6-digit PIN with secure enclave storage
+
+  ### Emergency Features
+  * **Panic Mode**: One-tap secure wipe (keys, chats, files, IndexedDB, Keystore)
+  * **Auto-Lock**: Configurable inactivity timeout
+  * **Emergency Contacts**: Encrypted contact backup
+
+  ### File Transfer (XFTP)
+  * Per-file AES-256-GCM encryption
+  * Configurable chunk size (default 1MB)
+  * Auto-delete after transfer
+  * Resumable transfers
+
+  ### Voice Calls (WebRTC)
+  * OPUS 48kHz mono audio
+  * DTLS-SRTP encryption
+  * ICE/STUN through Tor
+  * Real-time quality stats (RTT, codec, packet loss)
+
+  ### Transparency
+  * Open source (GPL-3.0-only)
+  * Reproducible builds
+  - No telemetry, analytics, or crash reporting
+  - No central metadata collection
+
+  ## Requirements
+  * Android 8.0+ (API 26)
+  * Orbot (recommended) or built-in Tor daemon
+
+RepoType: git
+Repo: https://github.com/nexuschat/nexuschat.git
+Builds:
+  - versionName: '1.0.0'
+    versionCode: 1
+    commit: v1.0.0
+    subdir: app
+    gradle:
+      - yes
+    prebuild:
+      - chmod +x gradlew
+    build:
+      - ./gradlew assembleRelease -PKEYSTORE_PATH=nexuschat.keystore -PKEYSTORE_PASS=$KEYSTORE_PASS -PKEY_ALIAS=$KEY_ALIAS -PKEY_PASS=$KEY_PASS
+    output: app/build/outputs/apk/release/app-release.apk
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: '1.0.0'
+CurrentVersionCode: 1

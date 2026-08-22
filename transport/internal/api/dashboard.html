@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saint Mary Liberty Island - Dashboard</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#0a0a1a; color:#e0e0e0; padding:20px; }
+  .container { max-width:1200px; margin:0 auto; }
+  h1 { color:#ffd700; font-size:2em; margin-bottom:5px; }
+  .subtitle { color:#888; margin-bottom:20px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:15px; margin-bottom:20px; }
+  .card { background:#1a1a2e; border:1px solid #2a2a4e; border-radius:12px; padding:20px; }
+  .card h3 { color:#ffd700; font-size:0.9em; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; }
+  .card .value { font-size:2em; font-weight:bold; }
+  .card .label { color:#888; font-size:0.85em; margin-top:4px; }
+  .green { color:#4ade80; }
+  .yellow { color:#fbbf24; }
+  .red { color:#f87171; }
+  .blue { color:#60a5fa; }
+  .section { margin-bottom:20px; }
+  .section h2 { color:#ffd700; font-size:1.3em; margin-bottom:10px; border-bottom:1px solid #2a2a4e; padding-bottom:8px; }
+  .service { display:flex; align-items:center; padding:8px 0; border-bottom:1px solid #1a1a2e; }
+  .service .dot { width:10px; height:10px; border-radius:50%; margin-right:12px; }
+  .service .name { flex:1; }
+  table { width:100%; border-collapse:collapse; }
+  td, th { padding:8px 12px; text-align:left; border-bottom:1px solid #1a1a2e; }
+  th { color:#ffd700; font-size:0.85em; text-transform:uppercase; }
+  .badge { padding:2px 8px; border-radius:4px; font-size:0.8em; }
+  .badge.ok { background:#166534; color:#4ade80; }
+  .badge.warn { background:#713f12; color:#fbbf24; }
+  .badge.err { background:#7f1d1d; color:#f87171; }
+  a { color:#60a5fa; text-decoration:none; }
+  a:hover { text-decoration:underline; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>SMLI Network Dashboard</h1>
+<p class="subtitle">Live status - <span id="time">updating...</span></p>
+<div id="metrics" class="grid">Loading...</div>
+<div id="services" class="section"><h2>Services</h2><div id="services-list">Loading...</div></div>
+<div id="ports-section" class="section"><h2>Open Ports</h2><div id="ports-list">Loading...</div></div>
+</div>
+<script>
+async function load(){
+  try {
+    let h = await fetch('/api/health').then(r=>r.json());
+    let hs = await fetch('/api/health/checks').then(r=>r.json());
+    let ps = await fetch('/api/admin/port-scan').then(r=>r.json());
+    let fi = await fetch('/api/admin/full-audit').then(r=>r.json());
+
+    let uptime = h.uptime_hours || '0';
+    let pct = h.disk_percent || '0';
+    let mem = h.ram_percent || '0';
+    let msgs = h.message_count || 0;
+
+    var m1 = '<div class="card"><h3>Uptime</h3><div class="value green">' + uptime + 'h</div></div>';
+    var diskClass = parseFloat(pct) > 90 ? 'red' : (parseFloat(pct) > 80 ? 'yellow' : 'green');
+    var memClass = parseFloat(mem) > 90 ? 'red' : (parseFloat(mem) > 80 ? 'yellow' : 'blue');
+    m1 += '<div class="card"><h3>Disk</h3><div class="value ' + diskClass + '">' + pct + '%</div></div>';
+    m1 += '<div class="card"><h3>Memory</h3><div class="value ' + memClass + '">' + mem + '%</div></div>';
+    m1 += '<div class="card"><h3>Messages</h3><div class="value blue">' + msgs + '</div></div>';
+
+    if(fi) {
+      m1 += '<div class="card"><h3>CPU Load</h3><div class="value blue">' + (fi.system ? (fi.system.load_1m||'?').toFixed(1) : '?') + '</div></div>';
+      var upCount = fi.services ? fi.services.filter(function(s){return s.status==='up'}).length : '?';
+      var totCount = fi.services ? fi.services.length : '?';
+      m1 += '<div class="card"><h3>Services Up</h3><div class="value green">' + upCount + '/' + totCount + '</div></div>';
+    }
+
+    document.getElementById('metrics').innerHTML = m1;
+
+    var svcList = '';
+    if(hs.checks) hs.checks.forEach(function(c) {
+      var ok = c.status === 'ok';
+      svcList += '<div class="service"><span class="dot ' + (ok?'green':'red') + '"></span><span class="name">' + c.name + '</span><span class="badge ' + (ok?'ok':'err') + '">' + (ok?'OK':'DOWN') + '</span></div>';
+    });
+    document.getElementById('services-list').innerHTML = svcList;
+
+    if(ps.unexpected && ps.unexpected.length > 0) {
+      document.getElementById('ports-list').innerHTML = '<div style="color:#f87171">Unexpected ports: ' + ps.unexpected.join(', ') + '</div>';
+    } else {
+      document.getElementById('ports-list').innerHTML = '<div class="green">All ' + ps.total_open + ' ports are authorized</div>';
+    }
+  } catch(e) {
+    document.getElementById('metrics').innerHTML = '<div style="color:red">Error loading: ' + e.message + '</div>';
+  }
+}
+load();
+setInterval(load, 15000);
+document.getElementById('time').textContent = new Date().toLocaleString();
+</script>
+</body>
+</html>

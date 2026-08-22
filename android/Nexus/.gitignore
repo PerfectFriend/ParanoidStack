@@ -1,0 +1,59 @@
+# Android
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.aar
+*.ap_
+*.dex
+
+# Keystore — NEVER commit
+*.keystore
+*.jks
+*.key
+key.properties
+
+# Gradle properties with secrets
+# gradle.properties is committed but local overrides are not:
+local.properties
+
+# App build outputs
+app/build/
+
+# NDK
+obj/
+
+# IntelliJ / Android Studio
+*.iws
+out/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries
+.idea/libraries
+.idea/deploymentTargetDropDown.xml
+.idea/render.experimental.xml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+/logs/
+
+# Secrets (NEVER commit these)
+KEYSTORE_PATH
+KEYSTORE_PASS
+KEY_ALIAS
+KEY_PASS
+ts_auth_key.txt
+tor_control_pass.txt

@@ -1,0 +1,59 @@
+{
+  "name": "NexusChat — Secure Comms",
+  "short_name": "NexusChat",
+  "description": "SimpleX Protocol · Tor VPN · .onion · E2E Encrypted · XFTP",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#04080f",
+  "theme_color": "#04080f",
+  "scope": "./",
+  "lang": "en",
+  "categories": ["communication", "security", "privacy"],
+  "icons": [
+    { "src": "icon-72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any" },
+    { "src": "icon-96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any" },
+    { "src": "icon-128.png",  "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "icon-144.png",  "sizes": "144x144", "type": "image/png", "purpose": "maskable any" },
+    { "src": "icon-152.png",  "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "maskable any" },
+    { "src": "icon-384.png",  "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "maskable any" }
+  ],
+  "screenshots": [
+    { "src": "screenshot1.png", "sizes": "390x844", "type": "image/png", "form_factor": "narrow", "label": "Dashboard" },
+    { "src": "screenshot2.png", "sizes": "390x844", "type": "image/png", "form_factor": "narrow", "label": "Encrypted Chat" }
+  ],
+  "shortcuts": [
+    { "name": "Open Chats",    "url": "./index.html#chats",    "description": "Open encrypted messages" },
+    { "name": "New Contact",   "url": "./index.html#new",      "description": "Add a new SimpleX contact" },
+    { "name": "Server Config", "url": "./index.html#settings", "description": "Configure SMP server" }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=chat.simplex.app",
+      "id": "chat.simplex.app"
+    }
+  ],
+  "protocol_handlers": [
+    { "protocol": "simplex", "url": "./index.html?uri=%s" }
+  ],
+  "share_target": {
+    "action": "./index.html",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text":  "text",
+      "files": [{ "name": "file", "accept": ["*/*"] }]
+    }
+  },
+  "file_handlers": [
+    {
+      "action": "./index.html",
+      "accept": { "application/json": [".json"], "*/*": [] }
+    }
+  ]
+}

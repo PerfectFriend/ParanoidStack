@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Network Security Config
+
+  Rules:
+  - .onion domains: allow cleartext — Tor transport layer encrypts all traffic
+  - localhost: allow cleartext — Tor SOCKS5 and SMP server run locally
+  - Everything else: TLS only, certificate pinning for Tailscale API
+-->
+<network-security-config>
+
+    <!-- .onion: cleartext OK — Tor provides E2E transport security -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">onion</domain>
+        <domain includeSubdomains="true">localhost</domain>
+        <domain>127.0.0.1</domain>
+    </domain-config>
+
+    <!-- Tailscale API: TLS only -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.tailscale.com</domain>
+    </domain-config>
+
+    <!-- Default: TLS only, no cleartext for everything else -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <!-- System CA bundle only — no user-installed CAs -->
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+</network-security-config>

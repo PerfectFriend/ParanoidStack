@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ParanoidX Node • Dashboard</title>
+<style>
+:root {
+  --bg:#0a0a0c; --card:#141418; --accent:#3b82f6; --danger:#ef4444;
+  --ok:#22c55e; --warn:#f59e0b; --text:#e5e7eb; --muted:#9ca3af;
+  --border:#222; --input:#0f0f12; --hover:#1a1a22;
+  --vpn1:#3b82f6; --vpn2:#8b5cf6; --tor:#f59e0b;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; line-height:1.5; }
+header { background:#111114; padding:14px 24px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; flex-wrap:wrap; }
+h1 { margin:0; font-size:1.35rem; letter-spacing:-0.03em; }
+.badge { background:#222; padding:2px 9px; border-radius:999px; font-size:0.7rem; color:#aaa; }
+.card { background:var(--card); border-radius:14px; padding:18px 20px; margin:16px 20px; border:1px solid var(--border); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+h2 { margin:0 0 12px; font-size:1.05rem; display:flex; align-items:center; gap:8px; }
+button { background:var(--accent); color:#fff; border:none; padding:9px 16px; border-radius:9px; font-size:0.92rem; font-weight:500; cursor:pointer; transition:all 0.15s; }
+button:hover { transform:scale(1.015); filter:brightness(1.1); }
+button:active { transform:scale(0.985); }
+button.danger { background:var(--danger); }
+button.secondary { background:#2a2a30; }
+button.success { background:#16a34a; }
+button:disabled { opacity:0.5; cursor:not-allowed; }
+.addr { font-family:ui-monospace,monospace; background:var(--input); padding:9px 11px; border-radius:8px; word-break:break-all; font-size:0.86rem; margin:6px 0; border:1px solid var(--border); }
+.row { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px; }
+.grid-sm { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:8px; }
+.status-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px; }
+.status-ok { background:var(--ok); box-shadow:0 0 8px var(--ok); }
+.status-warn { background:var(--warn); box-shadow:0 0 8px var(--warn); }
+.status-err { background:var(--danger); box-shadow:0 0 8px var(--danger); }
+.status-unknown { background:var(--muted); }
+.mono { font-family:ui-monospace,monospace; font-size:0.85rem; }
+.muted { color:var(--muted); font-size:0.85rem; }
+.input-group { display:flex; flex-direction:column; gap:4px; margin-bottom:12px; }
+label { font-size:0.85rem; font-weight:500; }
+input, select, textarea { background:var(--input); border:1px solid var(--border); color:var(--text); padding:10px 12px; border-radius:8px; font-family:inherit; font-size:0.9rem; }
+input:focus, select:focus, textarea:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 2px rgba(59,130,246,0.2); }
+textarea { min-height:100px; resize:vertical; font-family:ui-monospace,monospace; }
+.file-list { max-height:300px; overflow-y:auto; border:1px solid var(--border); border-radius:8px; background:var(--input); }
+.file-item { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border-bottom:1px solid var(--border); }
+.file-item:last-child { border-bottom:none; }
+.file-item:hover { background:var(--hover); }
+.file-info { display:flex; flex-direction:column; gap:2px; }
+.file-name { font-weight:500; }
+.file-meta { font-size:0.75rem; color:var(--muted); }
+.tabs { display:flex; gap:4px; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:4px; }
+.tab-btn { background:transparent; color:var(--muted); border:none; padding:8px 16px; border-radius:8px 8px 0 0; font-size:0.85rem; font-weight:500; }
+.tab-btn.active { color:var(--accent); background:var(--hover); border-bottom:2px solid var(--accent); }
+.tab-btn:hover { color:var(--text); }
+.tab-content { display:none; }
+.tab-content.active { display:block; animation:fadeIn 0.2s; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+.chain-step { display:flex; align-items:center; gap:12px; padding:12px; background:var(--input); border-radius:10px; margin:8px 0; border:1px solid var(--border); }
+.chain-step-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; }
+.chain-vpn1 { background:rgba(59,130,246,0.15); border-color:rgba(59,130,246,0.3); }
+.chain-vpn2 { background:rgba(139,92,246,0.15); border-color:rgba(139,92,246,0.3); }
+.chain-tor { background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.3); }
+.chain-status { flex:1; }
+.chain-arrow { color:var(--muted); font-size:1.5rem; }
+.progress-bar { height:6px; background:var(--input); border-radius:3px; overflow:hidden; margin-top:4px; }
+.progress-fill { height:100%; border-radius:3px; transition:width 0.3s; }
+.section { margin-bottom:20px; }
+.section-title { font-size:0.9rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.kv { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border); }
+.kv:last-child { border-bottom:none; }
+.kv-key { color:var(--muted); }
+.kv-value { font-family:ui-monospace,monospace; text-align:right; }
+.modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.88); align-items:center; justify-content:center; z-index:99999; }
+.modal.active { display:flex; }
+.modal-content { background:#16161b; padding:22px; border-radius:14px; max-width:480px; width:94%; max-height:80vh; overflow-y:auto; }
+.drag-drop { border:2px dashed var(--border); border-radius:12px; padding:40px 20px; text-align:center; cursor:pointer; transition:all 0.2s; }
+.drag-drop:hover, .drag-drop.active { border-color:var(--accent); background:rgba(59,130,246,0.05); }
+.drag-drop-icon { font-size:3rem; margin-bottom:12px; }
+.log-entry { padding:4px 8px; font-family:ui-monospace,monospace; font-size:0.75rem; border-bottom:1px solid #1a1a1a; }
+.log-entry:hover { background:var(--hover); }
+.log-time { color:var(--muted); }
+.log-source { color:var(--accent); margin:0 8px; }
+.log-level-ok { color:var(--ok); }
+.log-level-warn { color:var(--warn); }
+.log-level-err { color:var(--danger); }
+.log-level-svc { color:#44cc44; }
+.log-level-req { color:#44aaaa; }
+.log-level-debug { color:var(--muted); }
+.toast { position:fixed; bottom:24px; right:24px; padding:12px 20px; border-radius:10px; background:var(--card); border:1px solid var(--border); box-shadow:0 10px 30px rgba(0,0,0,0.5); z-index:10000; animation:slideIn 0.3s; }
+.toast.ok { border-left:4px solid var(--ok); }
+.toast.err { border-left:4px solid var(--danger); }
+.toast.warn { border-left:4px solid var(--warn); }
+@keyframes slideIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+.chart-container { height:120px; position:relative; }
+.sparkline { stroke:var(--accent); stroke-width:2; fill:none; }
+.sparkline.ok { stroke:var(--ok); }
+.sparkline.warn { stroke:var(--warn); }
+.sparkline.err { stroke:var(--danger); }
+@media (max-width: 640px) {
+  header { flex-wrap:wrap; padding:10px 12px; gap:6px; }
+  h1 { font-size:1.15rem; }
+  .badge { font-size:0.6rem; padding:1px 6px; }
+  .card { margin:10px 8px; padding:14px 14px; border-radius:12px; }
+  .chain-step { flex-direction:column; align-items:flex-start; }
+  .chain-arrow { display:none; }
+  .grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>ParanoidX Node</h1>
+  <span class="badge" id="buildBadge">C41-C60</span>
+  <span class="badge" id="nodeStatus">Checking...</span>
+  <span class="badge" id="chainStatus">Checking...</span>
+  <div style="flex:1"></div>
+  <button onclick="showToast('Manual refresh', 'ok')" class="secondary">🔄 Refresh</button>
+  <button onclick="showTab('bridge')" id="tabBridgeBtn">🔗 Bridge</button>
+  <button onclick="showTab('config')" id="tabConfigBtn">⚙ Config</button>
+  <button onclick="showTab('monitor')" id="tabMonitorBtn" class="active">📊 Monitor</button>
+</header>
+
+<div class="tab-content active" id="tabMonitor">
+  <div class="card">
+    <h2>📡 Node Overview</h2>
+    <div class="grid-sm">
+      <div class="card">
+        <h3 style="margin:0 0 8px; font-size:0.9rem">🖥 System</h3>
+        <div class="kv"><span class="kv-key">CPU</span><span class="kv-value mono" id="sysCpu">--%</span></div>
+        <div class="kv"><span class="kv-key">RAM</span><span class="kv-value mono" id="sysRam">--%</span></div>
+        <div class="kv"><span class="kv-key">Disk</span><span class="kv-value mono" id="sysDisk">--%</span></div>
+        <div class="kv"><span class="kv-key">Uptime</span><span class="kv-value mono" id="sysUptime">--</span></div>
+      </div>
+      <div class="card">
+        <h3 style="margin:0 0 8px; font-size:0.9rem">🌐 Network</h3>
+        <div class="kv"><span class="kv-key">Hostname</span><span class="kv-value mono" id="sysHost">--</span></div>
+        <div class="kv"><span class="kv-key">External IP</span><span class="kv-value mono" id="sysExtIp">--</span></div>
+        <div class="kv"><span class="kv-key">VPN1 IP</span><span class="kv-value mono" id="sysVpn1Ip">--</span></div>
+        <div class="kv"><span class="kv-key">VPN2 SOCKS</span><span class="kv-value mono" id="sysVpn2Socks">--</span></div>
+      </div>
+      <div class="card">
+        <h3 style="margin:0 0 8px; font-size:0.9rem">🔗 Bridge Chain</h3>
+        <div class="kv"><span class="kv-key">VPN1</span><span class="kv-value"><span class="status-dot status-unknown" id="dotVpn1"></span><span id="statusVpn1">--</span></span></div>
+        <div class="kv"><span class="kv-key">VPN2</span><span class="kv-value"><span class="status-dot status-unknown" id="dotVpn2"></span><span id="statusVpn2">--</span></span></div>
+        <div class="kv"><span class="kv-key">Tor</span><span class="kv-value"><span class="status-dot status-unknown" id="dotTor"></span><span id="statusTor">--</span></span></div>
+        <div class="kv"><span class="kv-key">Full Chain</span><span class="kv-value"><span class="status-dot status-unknown" id="dotChain"></span><span id="statusChain">--</span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📊 Real-time Metrics</h2>
+    <div class="grid">
+      <div class="card">
+        <h3 style="margin:0 0 8px; font-size:0.9rem">📈 Latency (ms)</h3>
+        <svg class="chart-container" id="latencyChart" viewBox="0 0 400 120" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="card">
+        <h3 style="margin:0 0 8px; font-size:0.9rem">📊 Bandwidth (Mbps)</h3>
+        <svg class="chart-container" id="bandwidthChart" viewBox="0 0 400 120" preserveAspectRatio="none"></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🔗 Bridge Chain Visualization</h2>
+    <div id="bridgeChainVisual">Loading...</div>
+  </div>
+
+  <div class="card">
+    <h2>🧅 Onion Services (via Tor)</h2>
+    <div id="onionServices">Loading...</div>
+    <div class="row" style="margin-top:12px">
+      <button onclick="checkOnionServices()">🔍 Check All Now</button>
+      <button class="secondary" onclick="toggleAutoOnionCheck()" id="autoOnionBtn">🔄 Auto: OFF</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🐳 Docker Containers</h2>
+    <div id="dockerContainers">Loading...</div>
+    <div class="row" style="margin-top:12px">
+      <button onclick="loadDocker()">🔄 Refresh</button>
+      <button class="secondary" onclick="restartDocker()">🔄 Restart Stack</button>
+      <button class="danger" onclick="restartContainer()">🔄 Restart Container</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🔐 SimpleX Bridge</h2>
+    <div class="row">
+      <button onclick="testBridge()">🔍 Test Connection</button>
+      <button onclick="showQR('bridge')">📱 Show QR</button>
+      <button class="secondary" onclick="reconnectBridge()">🔄 Reconnect</button>
+    </div>
+    <div class="hint" id="bridgeHint">Bridge status will appear here</div>
+  </div>
+
+  <div class="card">
+    <h2>🧅 Onion Addresses</h2>
+    <div id="onionAddresses">Loading...</div>
+  </div>
+
+  <div class="card">
+    <h2>📋 Live Logs</h2>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="filterLogs('ALL')">All</button>
+      <button class="tab-btn" onclick="filterLogs('SERVICE')">Service</button>
+      <button class="tab-btn" onclick="filterLogs('REQUEST')">Request</button>
+      <button class="tab-btn" onclick="filterLogs('ERROR')">Error</button>
+      <button class="tab-btn" onclick="filterLogs('WARNING')">Warning</button>
+      <button class="tab-btn" onclick="filterLogs('DEBUG')">Debug</button>
+    </div>
+    <div id="logContainer" style="max-height:300px; overflow-y:auto; background:var(--input); border-radius:8px; padding:8px; font-family:monospace; font-size:0.75rem;">
+      <div class="muted">Loading logs...</div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-content" id="tabBridge">
+  <div class="card">
+    <h2>🔗 Bridge Chain Control</h2>
+    <div class="row">
+      <button class="success" onclick="startBridge()">▶ Start Full Chain</button>
+      <button class="danger" onclick="stopBridge()">■ Stop Full Chain</button>
+      <button class="secondary" onclick="restartBridge()">⟳ Restart Chain</button>
+      <button onclick="runChainTests()">🚀 Run Tests</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📡 VPN1 (Outer Layer)</h2>
+    <div id="vpn1Detail">Loading...</div>
+    <div class="row" style="margin-top:12px">
+      <button onclick="startVpn1()">▶ Start VPN1</button>
+      <button class="danger" onclick="stopVpn1()">■ Stop VPN1</button>
+      <button class="secondary" onclick="restartVpn1()">⟳ Restart</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🔒 VPN2 (Inner Layer — Xray)</h2>
+    <div id="vpn2Detail">Loading...</div>
+    <div class="row" style="margin-top:12px">
+      <button onclick="startVpn2()">▶ Start VPN2</button>
+      <button class="danger" onclick="stopVpn2()">■ Stop VPN2</button>
+      <button class="secondary" onclick="restartVpn2()">⟳ Restart</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🧅 Tor (Final Layer)</h2>
+    <div id="torDetail">Loading...</div>
+    <div class="row" style="margin-top:12px">
+      <button onclick="testTorClient()">🔍 Test Tor Client</button>
+      <button class="secondary" onclick="showTorLogs()">📋 View Logs</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>⚡ Chain Connectivity Tests</h2>
+    <div id="chainTests">Loading...</div>
+    <div class="row" style="margin-top:12px">
+      <button onclick="runChainTests()">🚀 Run All Tests</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📊 Connection Quality History</h2>
+    <svg class="chart-container" id="qualityChart" viewBox="0 0 800 200" preserveAspectRatio="none"></svg>
+  </div>
+</div>
+
+<div class="tab-content" id="tabConfig">
+  <div class="card">
+    <h2>⚙ Configuration Management</h2>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showConfigTab('vpn1')" id="configVpn1Btn">📡 VPN1 Configs</button>
+      <button class="tab-btn" onclick="showConfigTab('vpn2')" id="configVpn2Btn">🔒 VPN2 Configs</button>
+      <button class="tab-btn" onclick="showConfigTab('tor')" id="configTorBtn">🧅 Tor Config</button>
+      <button class="tab-btn" onclick="showConfigTab('auto')" id="configAutoBtn">🔍 Auto-Discovery</button>
+      <button class="tab-btn" onclick="showConfigTab('system')" id="configSystemBtn">⚙ System</button>
+    </div>
+
+    <!-- VPN1 Configs -->
+    <div class="tab-content active" id="configVpn1">
+      <div class="section">
+        <div class="section-title">📁 Active VPN1 Config</div>
+        <div id="vpn1Current" class="muted">Loading...</div>
+      </div>
+      <div class="section">
+        <div class="section-title">📤 Upload / Import VPN1 Config</div>
+        <div class="drag-drop" id="vpn1Drop" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event, 'vpn1')">
+          <div class="drag-drop-icon">📡</div>
+          <div>Drag & drop <strong>.conf</strong> (WireGuard) or <strong>.ovpn</strong> (OpenVPN) or <strong>.json</strong> (Hysteria2)</div>
+          <div class="muted" style="margin-top:8px">or click to browse</div>
+          <input type="file" id="vpn1File" accept=".conf,.ovpn,.json" style="display:none" onchange="handleFileSelect(event, 'vpn1')">
+        </div>
+        <div class="row">
+          <select id="vpn1Proto" style="flex:1">
+            <option value="wireguard">WireGuard</option>
+            <option value="openvpn">OpenVPN</option>
+            <option value="hysteria2">Hysteria2</option>
+          </select>
+          <button onclick="uploadConfig('vpn1')">⬆ Import</button>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">📂 Available VPN1 Configs</div>
+        <div class="file-list" id="vpn1FileList">Loading...</div>
+      </div>
+    </div>
+
+    <!-- VPN2 Configs -->
+    <div class="tab-content" id="configVpn2">
+      <div class="section">
+        <div class="section-title">📁 Active VPN2 Config</div>
+        <div id="vpn2Current" class="muted">Loading...</div>
+      </div>
+      <div class="section">
+        <div class="section-title">📤 Upload / Import VPN2 Config</div>
+        <div class="drag-drop" id="vpn2Drop" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event, 'vpn2')">
+          <div class="drag-drop-icon">🔒</div>
+          <div>Drag & drop <strong>.json</strong> (Xray VLESS/VMess/Trojan/SS)</div>
+          <div class="muted" style="margin-top:8px">or paste connection URL below</div>
+          <input type="file" id="vpn2File" accept=".json" style="display:none" onchange="handleFileSelect(event, 'vpn2')">
+        </div>
+        <div class="input-group">
+          <label>Connection URL (vmess://, vless://, trojan://, ss://, hy2://, wireguard://)</label>
+          <textarea id="vpn2Url" placeholder="vless://uuid@host:port?..."></textarea>
+        </div>
+        <div class="row">
+          <select id="vpn2Proto" style="flex:1">
+            <option value="vless">VLESS</option>
+            <option value="vmess">VMess</option>
+            <option value="trojan">Trojan</option>
+            <option value="shadowsocks">Shadowsocks</option>
+            <option value="hysteria2">Hysteria2</option>
+            <option value="wireguard">WireGuard</option>
+          </select>
+          <button onclick="uploadConfig('vpn2')">⬆ Import</button>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">📂 Available VPN2 Configs</div>
+        <div class="file-list" id="vpn2FileList">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Tor Config -->
+    <div class="tab-content" id="configTor">
+      <div class="section">
+        <div class="section-title">🧅 Tor Hidden Services (Server)</div>
+        <div id="torServices">Loading...</div>
+      </div>
+      <div class="section">
+        <div class="section-title">🔄 Tor Client (On-Demand)</div>
+        <div class="muted">Tor client is started automatically by bridge chain with VPN2 SOCKS as upstream proxy</div>
+        <div class="row" style="margin-top:8px">
+          <button onclick="testTorClient()">🔍 Test Tor Client</button>
+          <button class="secondary" onclick="showTorClientLog()">📋 View Logs</button>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">🔑 Onion Key Management</div>
+        <div class="row">
+          <button class="success" onclick="backupOnionKeys()">💾 Backup Current Keys</button>
+          <button class="secondary" onclick="restoreOnionKeys()">📥 Restore from Backup</button>
+          <button class="warn" onclick="rotateOnionKeys()">🔄 Rotate Keys (Plan)</button>
+        </div>
+        <div class="muted" style="margin-top:8px">Backup saves keys to tor-keys-backup. Restore loads original client-compatible keys. Rotation requires secure distribution protocol (not implemented).</div>
+      </div>
+    </div>
+
+    <!-- Auto-Discovery -->
+    <div class="tab-content" id="configAuto">
+      <div class="section">
+        <div class="section-title">🔍 Auto-Discovery Settings</div>
+        <div class="input-group">
+          <label>Watch Directory for Configs</label>
+          <input type="text" id="watchDir" value="/home/thomas/ParanoidX/configs" placeholder="/path/to/config/folder">
+        </div>
+        <div class="input-group">
+          <label>Subscription URLs (one per line)</label>
+          <textarea id="subscriptionUrls" placeholder="https://raw.githubusercontent.com/.../subs/main.txt&#10;https://.../free-nodes.txt"></textarea>
+        </div>
+        <div class="input-group">
+          <label>Scan Interval (minutes)</label>
+          <input type="number" id="scanInterval" value="60" min="5" max="1440">
+        </div>
+        <div class="row">
+          <button onclick="saveAutoConfig()">💾 Save Settings</button>
+          <button class="secondary" onclick="runAutoDiscovery()">🔍 Scan Now</button>
+          <button onclick="fetchSubscriptions()">📥 Fetch Subscriptions</button>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">📋 Discovered / Imported Configs</div>
+        <div class="file-list" id="autoFileList">Loading...</div>
+      </div>
+    </div>
+
+    <!-- System Config -->
+    <div class="tab-content" id="configSystem">
+      <div class="section">
+        <div class="section-title">⚙ System Settings</div>
+        <div class="grid">
+          <div class="input-group">
+            <label>API Listen Address</label>
+            <input type="text" id="apiListen" value="0.0.0.0:8080">
+          </div>
+          <div class="input-group">
+            <label>Data Directory</label>
+            <input type="text" id="dataDir" value="/home/thomas/.local/share/ParanoidX">
+          </div>
+          <div class="input-group">
+            <label>Log Level</label>
+            <select id="logLevel">
+              <option value="debug">Debug</option>
+              <option value="info" selected>Info</option>
+              <option value="warn">Warning</option>
+              <option value="error">Error</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Poll Interval (seconds)</label>
+            <input type="number" id="pollInterval" value="60" min="10" max="300">
+          </div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button onclick="saveSystemConfig()">💾 Save System Config</button>
+          <button class="secondary" onclick="restartNode()">🔄 Restart Node</button>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">🔐 Security</div>
+        <div class="row">
+          <button class="danger" onclick="wipeAllConfigs()">🗑 Wipe All Configs</button>
+          <button class="warn" onclick="resetToDefaults()">⚠ Reset to Defaults</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toastContainer"></div>
+
+<script>
+const API = 'http://127.0.0.1:8080';
+let currentTab = 'monitor';
+let logFilter = 'ALL';
+let autoCheckInterval = null;
+let autoOnionInterval = null;
+let latencyHistory = [];
+let bandwidthHistory = [];
+let qualityHistory = [];
+const MAX_HISTORY = 60;
+
+// ========== Utility ==========
+async function fetchJSON(url, options = {}) {
+  try {
+    const res = await fetch(url, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers } });
+    return await res.json();
+  } catch (e) {
+    return { _error: e.message };
+  }
+}
+
+function setBadge(el, text, ok) {
+  if (!el) return;
+  el.textContent = text;
+  el.style.background = ok ? '#22c55e' : '#ef4444';
+}
+
+function setDot(el, status) {
+  if (!el) return;
+  el.className = 'status-dot ' + (status === true ? 'status-ok' : (status === false ? 'status-err' : (status === 'warn' ? 'status-warn' : 'status-unknown')));
+}
+
+function showToast(msg, type = 'ok') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => { toast.remove(); }, 4000);
+}
+
+function showTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('#tabMonitorBtn, #tabBridgeBtn, #tabConfigBtn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Btn').classList.add('active');
+}
+
+function showConfigTab(tab) {
+  document.querySelectorAll('#configVpn1, #configVpn2, #configTor, #configAuto, #configSystem').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('#configVpn1Btn, #configVpn2Btn, #configTorBtn, #configAutoBtn, #configSystemBtn').forEach(b => b.classList.remove('active'));
+  document.getElementById('config' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  document.getElementById('config' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Btn').classList.add('active');
+}
+
+function filterLogs(level) {
+  logFilter = level;
+  document.querySelectorAll('#tabMonitor .tab-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  loadLogs();
+}
+
+function osBasename(path) {
+  return path.split('/').pop() || path;
+}
+
+function addHistory(arr, val) {
+  arr.push({ t: Date.now(), v: val });
+  if (arr.length > MAX_HISTORY) arr.shift();
+}
+
+// ========== Charts ==========
+function drawSparkline(svgId, data, color) {
+  const svg = document.getElementById(svgId);
+  if (!svg || data.length < 2) return;
+  const w = svg.clientWidth || 400;
+  const h = svg.clientHeight || 120;
+  const maxV = Math.max(...data.map(d => d.v), 1);
+  const minV = Math.min(...data.map(d => d.v), 0);
+  const range = maxV - minV || 1;
+  
+  let path = '';
+  data.forEach((d, i) => {
+    const x = (i / (data.length - 1)) * w;
+    const y = h - ((d.v - minV) / range) * (h - 20) - 10;
+    path += (i === 0 ? 'M' : 'L') + x + ',' + y + ' ';
+  });
+  
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="grad-${svgId}" x1="0%" y1="100%" x2="0%" y2="0%">
+        <stop offset="0%" style="stop-color:${color};stop-opacity:0.1" />
+        <stop offset="100%" style="stop-color:${color};stop-opacity:0" />
+      </linearGradient>
+    </defs>
+    <path d="${path}" stroke="${color}" stroke-width="2" fill="none" class="sparkline"/>
+    <path d="${path}L${w},${h}L0,${h}Z" fill="url(#grad-${svgId})"/>
+    <text x="8" y="14" font-size="11" fill="${color}" font-family="monospace">${data[data.length-1]?.v?.toFixed(1) || '--'}</text>
+  `;
+}
+
+function updateCharts() {
+  if (latencyHistory.length > 1) drawSparkline('latencyChart', latencyHistory, '#3b82f6');
+  if (bandwidthHistory.length > 1) drawSparkline('bandwidthChart', bandwidthHistory, '#22c55e');
+  if (qualityHistory.length > 1) drawQualityChart();
+}
+
+function drawQualityChart() {
+  const svg = document.getElementById('qualityChart');
+  if (!svg || qualityHistory.length < 2) return;
+  const w = svg.clientWidth || 800;
+  const h = svg.clientHeight || 200;
+  
+  const layers = [
+    { data: qualityHistory.filter(d => d.vpn1 !== undefined).map(d => ({t: d.t, v: d.vpn1})), color: '#3b82f6', label: 'VPN1' },
+    { data: qualityHistory.filter(d => d.vpn2 !== undefined).map(d => ({t: d.t, v: d.vpn2})), color: '#8b5cf6', label: 'VPN2' },
+    { data: qualityHistory.filter(d => d.tor !== undefined).map(d => ({t: d.t, v: d.tor})), color: '#f59e0b', label: 'Tor' },
+  ];
+  
+  let html = '';
+  const t0 = qualityHistory[0].t;
+  const t1 = qualityHistory[qualityHistory.length-1].t;
+  const trange = t1 - t0 || 1;
+  
+  layers.forEach((layer, li) => {
+    if (layer.data.length < 2) return;
+    const maxV = Math.max(...layer.data.map(d => d.v), 1);
+    const minV = Math.min(...layer.data.map(d => d.v), 0);
+    const range = maxV - minV || 1;
+    let path = '';
+    layer.data.forEach((d, i) => {
+      const x = ((d.t - t0) / trange) * w;
+      const y = h - ((d.v - minV) / range) * (h - 30) - 10;
+      path += (i === 0 ? 'M' : 'L') + x + ',' + y + ' ';
+    });
+    html += `<path d="${path}" stroke="${layer.color}" stroke-width="2" fill="none" opacity="0.8"/>`;
+    html += `<text x="${10 + li * 120}" y="18" font-size="11" fill="${layer.color}" font-family="monospace">${layer.label}</text>`;
+  });
+  
+  // Time labels
+  for (let i = 0; i <= 4; i++) {
+    const x = (i / 4) * w;
+    const t = t0 + (trange * i / 4);
+    const label = new Date(t).toLocaleTimeString();
+    html += `<text x="${x}" y="${h-2}" font-size="9" fill="var(--muted)" text-anchor="middle">${label}</text>`;
+  }
+  
+  svg.innerHTML = html;
+}
+
+// ========== MAIN TABS ==========
+function showTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('#tabMonitorBtn, #tabBridgeBtn, #tabConfigBtn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Btn').classList.add('active');
+}
+
+function showConfigTab(tab) {
+  document.querySelectorAll('#configVpn1, #configVpn2, #configTor, #configAuto, #configSystem').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('#configVpn1Btn, #configVpn2Btn, #configTorBtn, #configAutoBtn, #configSystemBtn').forEach(b => b.classList.remove('active'));
+  document.getElementById('config' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  document.getElementById('config' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Btn').classList.add('active');
+}
+
+// ========== API ==========
+async function fetchJSON(url, options = {}) {
+  try {
+    const res = await fetch(url, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers } });
+    return await res.json();
+  } catch (e) {
+    return { _error: e.message };
+  }
+}
+
+async function fetchText(url, options = {}) {
+  try {
+    const res = await fetch(url, options);
+    return await res.text();
+  } catch (e) {
+    return { _error: e.message };
+  }
+}
+
+// ========== MONITOR TAB ==========
+async function loadAll() {
+  await Promise.all([
+    loadHealth(),
+    loadSystemInfo(),
+    loadBridgeChain(),
+    loadOnionServices(),
+    loadDocker(),
+    loadOnions(),
+    loadLogs()
+  ]);
+  updateCharts();
+}
+
+async function loadHealth() {
+  const h = await fetchJSON('/api/health');
+  setBadge('nodeStatus', h.healthy ? '✓ Healthy' : '✗ Down', h.healthy);
+  setBadge('bridgeStatus', h.bridge ? '✓ Bridge' : '✗ No Bridge', h.bridge);
+}
+
+async function loadSystemInfo() {
+  const info = await fetchJSON('/api/admin/info');
+  if (info._error) return;
+  
+  document.getElementById('sysCpu').textContent = (info.cpu_percent || 0).toFixed(1) + '%';
+  document.getElementById('sysRam').textContent = (info.mem_percent || 0).toFixed(1) + '%';
+  document.getElementById('sysDisk').textContent = (info.disk_percent || 0).toFixed(1) + '%';
+  document.getElementById('sysUptime').textContent = formatUptime(info.uptime_seconds || 0);
+  document.getElementById('sysHost').textContent = info.hostname || '?';
+  document.getElementById('sysExtIp').textContent = info.external_ip || '?';
+}
+
+function formatUptime(sec) {
+  if (!sec) return '--';
+  const d = Math.floor(sec / 86400);
+  const h = Math.floor((sec % 86400) / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  return (d ? d + 'd ' : '') + (h ? h + 'h ' : '') + m + 'm';
+}
+
+async function loadBridgeChain() {
+  const b = await fetchJSON('/api/bridge/status');
+  const container = document.getElementById('bridgeChainVisual');
+  
+  if (b._error) {
+    container.innerHTML = '<span class="badge" style="background:var(--danger)">Error: ' + b._error + '</span>';
+    return;
+  }
+
+  const vpn1 = b.vpn1 || {};
+  const vpn2 = b.vpn2 || {};
+  const tor = b.tor || {};
+  const chain = b.chain || {};
+
+  // Update status dots
+  setDot('dotVpn1', vpn1.running);
+  setDot('dotVpn2', vpn2.running);
+  setDot('dotTor', tor.onion_reachable);
+  setDot('dotChain', chain.full_chain);
+  
+  document.getElementById('statusVpn1').textContent = vpn1.running ? 'RUNNING' : (vpn1.configured ? 'STOPPED' : 'NOT CONFIGURED');
+  document.getElementById('statusVpn2').textContent = vpn2.running ? 'RUNNING' : (vpn2.configured ? 'STOPPED' : 'NOT CONFIGURED');
+  document.getElementById('statusTor').textContent = tor.onion_reachable ? 'ONION REACHABLE' : 'NO ONION ACCESS';
+  document.getElementById('statusChain').textContent = chain.full_chain ? 'WORKING' : 'BROKEN';
+  
+  document.getElementById('sysVpn1Ip').textContent = vpn1.ip || 'Not detected';
+  document.getElementById('sysVpn2Socks').textContent = vpn2.socks_port || '?';
+
+  setBadge('chainStatus', chain.full_chain ? '✓ Full Chain' : '⚠ Partial', chain.full_chain);
+
+  // Visual chain
+  container.innerHTML = `
+    <div class="chain-step chain-vpn1">
+      <div class="chain-step-icon" style="background:rgba(59,130,246,0.2); color:var(--vpn1);">📡</div>
+      <div class="chain-status">
+        <strong>VPN1 (Outer)</strong><br>
+        <span class="mono">${vpn1.proto || 'not configured'}</span>
+        ${vpn1.ip ? `<br><span class="mono">${vpn1.ip}</span>` : ''}
+      </div>
+      <span class="status-dot ${vpn1.running ? 'status-ok' : (vpn1.configured ? 'status-warn' : 'status-err')}"></span>
+      <div class="muted" style="min-width:80px">${vpn1.running ? 'RUNNING' : (vpn1.configured ? 'STOPPED' : 'NOT CONFIGURED')}</div>
+    </div>
+    <div class="chain-arrow">⬇</div>
+    <div class="chain-step chain-vpn2">
+      <div class="chain-step-icon" style="background:rgba(139,92,246,0.2); color:var(--vpn2);">🔒</div>
+      <div class="chain-status">
+        <strong>VPN2 (Inner — Xray)</strong><br>
+        <span class="mono">${vpn2.proto || 'not configured'}</span>
+        ${vpn2.socks_port ? `<br><span class="mono">SOCKS: ${vpn2.socks_port}</span>` : ''}
+      </div>
+      <span class="status-dot ${vpn2.running ? 'status-ok' : (vpn2.configured ? 'status-warn' : 'status-err')}"></span>
+      <div class="muted" style="min-width:80px">${vpn2.running ? 'RUNNING' : (vpn2.configured ? 'STOPPED' : 'NOT CONFIGURED')}</div>
+    </div>
+    <div class="chain-arrow">⬇</div>
+    <div class="chain-step chain-tor">
+      <div class="chain-step-icon" style="background:rgba(245,158,11,0.2); color:var(--tor);">🧅</div>
+      <div class="chain-status">
+        <strong>Tor (Final)</strong><br>
+        <span class="mono">SOCKS: ${tor.socks_port || 9050}</span>
+        <br><span class="mono">Client: ${tor.client_running ? 'Running' : 'On-demand'}</span>
+      </div>
+      <span class="status-dot ${tor.onion_reachable ? 'status-ok' : 'status-err'}"></span>
+      <div class="muted" style="min-width:80px">${tor.onion_reachable ? 'ONION REACHABLE' : 'NO ONION ACCESS'}</div>
+    </div>
+    <div style="margin-top:12px; padding:12px; background:var(--input); border-radius:10px; border:1px solid var(--border);">
+      <div class="grid-sm">
+        <div><span class="status-dot ${chain.vpn1_to_vpn2 ? 'status-ok' : 'status-err'}"></span> VPN1 → VPN2</div>
+        <div><span class="status-dot ${chain.vpn2_to_tor ? 'status-ok' : 'status-err'}"></span> VPN2 → Tor</div>
+        <div><span class="status-dot ${chain.full_chain ? 'status-ok' : 'status-err'}"></span> Full Chain</div>
+      </div>
+      <div class="progress-bar" style="margin-top:8px">
+        <div class="progress-fill" style="width:${(chain.vpn1_to_vpn2 + chain.vpn2_to_tor + chain.full_chain) * 33.3}%; background:${chain.full_chain ? 'var(--ok)' : (chain.vpn1_to_vpn2 && chain.vpn2_to_tor ? 'var(--warn)' : 'var(--danger)')}"></div>
+      </div>
+    </div>
+  `;
+
+  // Store for charts
+  if (vpn1.running !== undefined) addHistory(latencyHistory, { vpn1: vpn1.latency_ms || 0 });
+  if (vpn2.running !== undefined) addHistory(bandwidthHistory, { vpn2: vpn2.bandwidth_mbps || 0 });
+  if (tor.onion_reachable !== undefined) addHistory(qualityHistory, { vpn1: vpn1.latency_ms || 0, vpn2: vpn2.latency_ms || 0, tor: tor.latency_ms || 0 });
+}
+
+async function loadOnionServices() {
+  const container = document.getElementById('onionServices');
+  container.innerHTML = '<div class="muted">Checking onion services...</div>';
+  
+  const services = [
+    { name: 'Dashboard', onion: 'q273p7coau3uvzeddexvdgv6andorfzvplstztheso2qcsj4yqvfzzad.onion', port: 80 },
+    { name: 'SMP', onion: '7czed3rxeryz4zxlo7wiwgz36yfmdwvu6ylv5wkby3trei3qsuw4lnqd.onion', port: 5223 },
+    { name: 'XFTP', onion: 'fv3pfzxih5sjf33jmusfbskmd2i3lywaaaysh6tijc7df7k6sijq3yyd.onion', port: 443 },
+    { name: 'ICE/TURN', onion: 'rigx5uuqk5bgvcikjfbtqenw5qn3fra34nkynrrrfp2sijophhqu4pqd.onion', port: 3478 },
+    { name: 'Auditor', onion: 'aytiwnc5xwrrqnvxduychtzezfq77omtxbje5elmwmwsaa6zmfidtkid.onion', port: 80 }
+  ];
+
+  let html = '<div class="grid">';
+  for (const svc of services) {
+    html += `<div class="kv" id="onion-${svc.name.toLowerCase()}"><span class="kv-key">${svc.name}</span><span class="kv-value mono status-unknown">Checking...</span></div>`;
+  }
+  html += '</div>';
+  container.innerHTML = html;
+
+  for (const svc of services) {
+    const r = await fetchJSON('/api/onion/check?onion=' + encodeURIComponent(svc.onion) + '&port=' + svc.port);
+    const el = document.querySelector('#onion-' + svc.name.toLowerCase() + ' .kv-value');
+    if (el) {
+      el.textContent = r.reachable ? '✅ Reachable' : '❌ Unreachable';
+      el.className = 'kv-value mono ' + (r.reachable ? 'status-ok' : 'status-err');
+    }
+  }
+}
+
+function toggleAutoOnionCheck() {
+  const btn = document.getElementById('autoOnionBtn');
+  if (autoOnionInterval) {
+    clearInterval(autoOnionInterval);
+    autoOnionInterval = null;
+    btn.textContent = '🔄 Auto: OFF';
+    btn.classList.remove('success');
+  } else {
+    autoOnionInterval = setInterval(loadOnionServices, 60000);
+    btn.textContent = '🔄 Auto: ON';
+    btn.classList.add('success');
+    loadOnionServices();
+  }
+}
+
+async function checkOnionServices() {
+  await loadOnionServices();
+}
+
+async function loadDocker() {
+  const d = await fetchJSON('/api/admin/docker');
+  const container = document.getElementById('dockerContainers');
+  if (d._error || !d.containers) {
+    container.innerHTML = '<span class="badge" style="background:var(--danger)">Error loading</span>';
+    return;
+  }
+  const entries = Object.entries(d.containers);
+  if (entries.length === 0) {
+    container.innerHTML = '<span class="badge" style="background:var(--muted)">No containers</span>';
+    return;
+  }
+  container.innerHTML = entries.map(([name, status]) => {
+    const ok = status.includes('healthy') || status.startsWith('Up');
+    const short = name.replace('ParanoidX-', '');
+    return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+      <span>${short}</span>
+      <span class="badge" style="background:${ok ? '#22c55e' : '#ef4444'}">${status}</span>
+    </div>`;
+  }).join('');
+}
+
+async function loadOnions() {
+  const info = await fetchJSON('/api/admin/info');
+  const container = document.getElementById('onionAddresses');
+  if (info._error || !info.transport) {
+    container.innerHTML = '<span class="badge" style="background:var(--danger)">Error loading</span>';
+    return;
+  }
+  const t = info.transport;
+  container.innerHTML = `
+    <div class="addr"><strong>SMP:</strong> ${t.smp_onion || 'N/A'}</div>
+    <div class="addr"><strong>XFTP:</strong> ${t.xftp_onion || 'N/A'}</div>
+    <div class="addr"><strong>Dashboard:</strong> ${t.dashboard_onion || 'N/A'}</div>
+    <div class="addr"><strong>ICE/TURN:</strong> ${t.ice_onion || 'N/A'}</div>
+    <div class="addr"><strong>Auditor:</strong> ${t.auditor_onion || 'N/A'}</div>
+  `;
+}
+
+async function testBridge() {
+  const hint = document.getElementById('bridgeHint');
+  hint.textContent = 'Testing...';
+  const r = await fetchJSON('/api/bridge/status');
+  if (r._error) { hint.textContent = 'Error: ' + r._error; return; }
+  hint.textContent = r.bridge ? '✓ Bridge connected' : '✗ Bridge down';
+}
+
+async function restartDocker() {
+  if (!confirm('Restart Docker stack?')) return;
+  const r = await fetch('/api/admin/docker/restart', { method: 'POST' });
+  if (r.ok) setTimeout(loadDocker, 5000);
+}
+
+function showQR(type) { showToast('QR codes available via /api/chat/qr or /api/bridge/qr', 'ok'); }
+
+async function reconnectBridge() {
+  const r = await fetch('/api/bridge/connect', { method: 'POST' });
+  showToast(r.ok ? 'Reconnect triggered' : 'Failed', r.ok ? 'ok' : 'err');
+}
+
+// ========== BRIDGE TAB ==========
+async function loadBridgeDetail() {
+  const b = await fetchJSON('/api/bridge/status');
+  if (b._error) return;
+  
+  const vpn1 = b.vpn1 || {};
+  const vpn2 = b.vpn2 || {};
+  const tor = b.tor || {};
+  const chain = b.chain || {};
+  
+  document.getElementById('vpn1Detail').innerHTML = `
+    <div class="grid">
+      <div class="card chain-step chain-vpn1">
+        <h3 style="margin:0 0 8px">📡 VPN1 (Outer)</h3>
+        <div class="kv"><span class="kv-key">Protocol</span><span class="kv-value mono">${vpn1.proto || 'Not configured'}</span></div>
+        <div class="kv"><span class="kv-key">Config</span><span class="kv-value mono">${vpn1.config ? osBasename(vpn1.config) : 'N/A'}</span></div>
+        <div class="kv"><span class="kv-key">Interface IP</span><span class="kv-value mono">${vpn1.ip || 'Not detected'}</span></div>
+        <div class="kv"><span class="kv-key">Latency</span><span class="kv-value mono">${vpn1.latency_ms || '?'} ms</span></div>
+        <div class="kv"><span class="kv-key">Bandwidth</span><span class="kv-value mono">${vpn1.bandwidth_mbps || '?'} Mbps</span></div>
+        <div class="kv"><span class="kv-key">Status</span><span class="kv-value"><span class="status-dot ${vpn1.running ? 'status-ok' : (vpn1.configured ? 'status-warn' : 'status-err')}"></span>${vpn1.running ? 'RUNNING' : (vpn1.configured ? 'STOPPED' : 'NOT CONFIGURED')}</span></div>
+      </div>
+      <div class="card chain-step chain-vpn2">
+        <h3 style="margin:0 0 8px">🔒 VPN2 (Inner — Xray)</h3>
+        <div class="kv"><span class="kv-key">Protocol</span><span class="kv-value mono">${vpn2.proto || 'Not configured'}</span></div>
+        <div class="kv"><span class="kv-key">Config</span><span class="kv-value mono">${vpn2.config ? osBasename(vpn2.config) : 'N/A'}</span></div>
+        <div class="kv"><span class="kv-key">SOCKS Port</span><span class="kv-value mono">${vpn2.socks_port || 'N/A'}</span></div>
+        <div class="kv"><span class="kv-key">Latency</span><span class="kv-value mono">${vpn2.latency_ms || '?'} ms</span></div>
+        <div class="kv"><span class="kv-key">Bandwidth</span><span class="kv-value mono">${vpn2.bandwidth_mbps || '?'} Mbps</span></div>
+        <div class="kv"><span class="kv-key">Status</span><span class="kv-value"><span class="status-dot ${vpn2.running ? 'status-ok' : (vpn2.configured ? 'status-warn' : 'status-err')}"></span>${vpn2.running ? 'RUNNING' : (vpn2.configured ? 'STOPPED' : 'NOT CONFIGURED')}</span></div>
+      </div>
+      <div class="card chain-step chain-tor">
+        <h3 style="margin:0 0 8px">🧅 Tor (Final)</h3>
+        <div class="kv"><span class="kv-key">SOCKS Port</span><span class="kv-value mono">${tor.socks_port || 9050}</span></div>
+        <div class="kv"><span class="kv-key">Client Status</span><span class="kv-value"><span class="status-dot ${tor.client_running ? 'status-ok' : 'status-warn'}"></span>${tor.client_running ? 'RUNNING' : 'ON-DEMAND'}</span></div>
+        <div class="kv"><span class="kv-key">Onion Reachable</span><span class="kv-value"><span class="status-dot ${tor.onion_reachable ? 'status-ok' : 'status-err'}"></span>${tor.onion_reachable ? 'YES' : 'NO'}</span></div>
+        <div class="kv"><span class="kv-key">Latency</span><span class="kv-value mono">${tor.latency_ms || '?'} ms</span></div>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('vpn2Detail').innerHTML = document.getElementById('vpn1Detail').innerHTML;
+  document.getElementById('torDetail').innerHTML = `
+    <div class="kv"><span class="kv-key">SOCKS Port</span><span class="kv-value mono">${tor.socks_port || 9050}</span></div>
+    <div class="kv"><span class="kv-key">Client Running</span><span class="kv-value"><span class="status-dot ${tor.client_running ? 'status-ok' : 'status-warn'}"></span>${tor.client_running ? 'YES' : 'NO (on-demand)'}</span></div>
+    <div class="kv"><span class="kv-key">Onion Reachable</span><span class="kv-value"><span class="status-dot ${tor.onion_reachable ? 'status-ok' : 'status-err'}"></span>${tor.onion_reachable ? 'YES' : 'NO'}</span></div>
+    <div class="kv"><span class="kv-key">Latency</span><span class="kv-value mono">${tor.latency_ms || '?'} ms</span></div>
+  `;
+  
+  document.getElementById('chainTests').innerHTML = `
+    <div class="grid-sm">
+      <div class="card chain-step chain-vpn1">
+        <h3 style="margin:0 0 8px">VPN1 → VPN2</h3>
+        <div class="kv"><span class="kv-key">Status</span><span class="kv-value"><span class="status-dot ${chain.vpn1_to_vpn2 ? 'status-ok' : 'status-err'}"></span>${chain.vpn1_to_vpn2 ? 'CONNECTED' : 'FAILED'}</span></div>
+        <div class="kv"><span class="kv-key">Latency</span><span class="kv-value mono">${chain.vpn1_vpn2_latency || '?'} ms</span></div>
+      </div>
+      <div class="card chain-step chain-vpn2">
+        <h3 style="margin:0 0 8px">VPN2 → Tor</h3>
+        <div class="kv"><span class="kv-key">Status</span><span class="kv-value"><span class="status-dot ${chain.vpn2_to_tor ? 'status-ok' : 'status-err'}"></span>${chain.vpn2_to_tor ? 'CONNECTED' : 'FAILED'}</span></div>
+        <div class="kv"><span class="kv-key">Latency</span><span class="kv-value mono">${chain.vpn2_tor_latency || '?'} ms</span></div>
+      </div>
+      <div class="card chain-step chain-tor">
+        <h3 style="margin:0 0 8px">Full Chain</h3>
+        <div class="kv"><span class="kv-key">Status</span><span class="kv-value"><span class="status-dot ${chain.full_chain ? 'status-ok' : 'status-err'}"></span>${chain.full_chain ? 'WORKING' : 'BROKEN'}</span></div>
+        <div class="kv"><span class="kv-key">Total Latency</span><span class="kv-value mono">${chain.total_latency || '?'} ms</span></div>
+      </div>
+    </div>
+  `;
+}
+
+async function runChainTests() {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '🔄 Testing...';
+  await loadBridgeDetail();
+  btn.disabled = false;
+  btn.textContent = '🚀 Run All Tests';
+}
+
+async function startBridge() {
+  if (!confirm('Start bridge chain?')) return;
+  const r = await fetch('/api/bridge/start', { method: 'POST' });
+  showToast(r.ok ? 'Bridge start initiated' : 'Failed: ' + await r.text(), r.ok ? 'ok' : 'err');
+  if (r.ok) setTimeout(loadBridgeDetail, 3000);
+}
+
+async function stopBridge() {
+  if (!confirm('Stop bridge chain?')) return;
+  const r = await fetch('/api/bridge/stop', { method: 'POST' });
+  showToast(r.ok ? 'Bridge stop initiated' : 'Failed: ' + await r.text(), r.ok ? 'ok' : 'err');
+  if (r.ok) setTimeout(loadBridgeDetail, 2000);
+}
+
+async function restartBridge() {
+  await stopBridge();
+  setTimeout(startBridge, 3000);
+}
+
+async function startVpn1() {
+  const r = await fetch('/api/bridge/start-vpn1', { method: 'POST' });
+  showToast(r.ok ? 'VPN1 start initiated' : 'Failed', r.ok ? 'ok' : 'err');
+  if (r.ok) setTimeout(loadBridgeDetail, 2000);
+}
+
+async function stopVpn1() {
+  const r = await fetch('/api/bridge/stop-vpn1', { method: 'POST' });
+  showToast(r.ok ? 'VPN1 stop initiated' : 'Failed', r.ok ? 'ok' : 'err');
+}
+
+async function restartVpn1() { await stopVpn1(); setTimeout(startVpn1, 2000); }
+
+async function startVpn2() {
+  const r = await fetch('/api/bridge/start-vpn2', { method: 'POST' });
+  showToast(r.ok ? 'VPN2 start initiated' : 'Failed', r.ok ? 'ok' : 'err');
+  if (r.ok) setTimeout(loadBridgeDetail, 2000);
+}
+
+async function stopVpn2() {
+  const r = await fetch('/api/bridge/stop-vpn2', { method: 'POST' });
+  showToast(r.ok ? 'VPN2 stop initiated' : 'Failed', r.ok ? 'ok' : 'err');
+}
+
+async function restartVpn2() { await stopVpn2(); setTimeout(startVpn2, 2000); }
+
+async function testTorClient() {
+  const r = await fetchJSON('/api/tor/test-client');
+  showToast(r.reachable ? '✅ Tor client working' : '❌ Tor client failed: ' + (r.error || 'unknown'), r.reachable ? 'ok' : 'err');
+}
+
+async function showTorLogs() {
+  showToast('Tor client logs available in monitor logs tab', 'ok');
+}
+
+// ========== CONFIG TAB ==========
+async function loadConfigTab() {
+  await Promise.all([loadVpn1Configs(), loadVpn2Configs(), loadTorServices(), loadAutoConfigs(), loadSystemConfig()]);
+}
+
+async function loadVpn1Configs() {
+  const b = await fetchJSON('/api/bridge/status');
+  const vpn1 = b.vpn1 || {};
+  document.getElementById('vpn1Current').innerHTML = vpn1.configured 
+    ? `<div class="kv"><span class="kv-key">Protocol</span><span class="kv-value mono">${vpn1.proto}</span></div>
+       <div class="kv"><span class="kv-key">Config</span><span class="kv-value mono">${osBasename(vpn1.config)}</span></div>
+       <div class="kv"><span class="kv-key">Status</span><span class="kv-value"><span class="status-dot ${vpn1.running ? 'status-ok' : 'status-warn'}"></span>${vpn1.running ? 'RUNNING' : 'STOPPED'}</span></div>
+       <div class="kv"><span class="kv-key">Latency</span><span class="kv-value mono">${vpn1.latency_ms || '?'} ms</span></div>`
+    : '<div class="muted">No VPN1 config configured</div>';
+  
+  const list = await fetchJSON('/api/config/list?vpn=1');
+  renderFileList('vpn1FileList', list.files || [], 'vpn1');
+}
+
+async function loadVpn2Configs() {
+  const b = await fetchJSON('/api/bridge/status');
+  const vpn2 = b.vpn2 || {};
+  document.getElementById('vpn2Current').innerHTML = vpn2.configured
+    ? `<div class="kv"><span class="kv-key">Protocol</span><span class="kv-value mono">${vpn2.proto}</span></div>
+       <div class="kv"><span class="kv-key">Config</span><span class="kv-value mono">${osBasename(vpn2.config)}</span></div>
+       <div class="kv"><span class="kv-key">SOCKS Port</span><span class="kv-value mono">${vpn2.socks_port}</span></div>
+       <div class="kv"><span class="kv-key">Status</span><span class="kv-value"><span class="status-dot ${vpn2.running ? 'status-ok' : 'status-warn'}"></span>${vpn2.running ? 'RUNNING' : 'STOPPED'}</span></div>
+       <div class="kv"><span class="kv-key">Latency</span><span class="kv-value mono">${vpn2.latency_ms || '?'} ms</span></div>`
+    : '<div class="muted">No VPN2 config configured</div>';
+  
+  const list = await fetchJSON('/api/config/list?vpn=2');
+  renderFileList('vpn2FileList', list.files || [], 'vpn2');
+}
+
+async function loadTorServices() {
+  const info = await fetchJSON('/api/admin/info');
+  const container = document.getElementById('torServices');
+  if (info._error || !info.transport) { container.innerHTML = '<span class="badge" style="background:var(--danger)">Error</span>'; return; }
+  const t = info.transport;
+  container.innerHTML = `
+    <div class="grid">
+      <div class="addr"><strong>SMP:</strong> ${t.smp_onion || 'N/A'}</div>
+      <div class="addr"><strong>XFTP:</strong> ${t.xftp_onion || 'N/A'}</div>
+      <div class="addr"><strong>Dashboard:</strong> ${t.dashboard_onion || 'N/A'}</div>
+      <div class="addr"><strong>ICE/TURN:</strong> ${t.ice_onion || 'N/A'}</div>
+      <div class="addr"><strong>Auditor:</strong> ${t.auditor_onion || 'N/A'}</div>
+    </div>
+  `;
+}
+
+async function loadAutoConfigs() {
+  const list = await fetchJSON('/api/config/list?auto=1');
+  renderFileList('autoFileList', list.files || [], 'auto');
+}
+
+async function loadSystemConfig() {
+  const info = await fetchJSON('/api/admin/info');
+  // Populate system config fields
+}
+
+function renderFileList(containerId, files, type) {
+  const container = document.getElementById(containerId);
+  if (!files.length) { container.innerHTML = '<div class="muted" style="padding:20px;text-align:center">No configs found</div>'; return; }
+  container.innerHTML = files.map(f => `
+    <div class="file-item">
+      <div class="file-info">
+        <span class="file-name">${f.name}</span>
+        <span class="file-meta">${formatBytes(f.size)} • ${f.mtime} • ${f.proto || 'unknown'}</span>
+      </div>
+      <div class="row">
+        <button class="secondary" onclick="useConfig('${type}', '${f.path}')">Use</button>
+        <button class="danger" onclick="deleteConfig('${type}', '${f.path}')">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function formatBytes(bytes) {
+  if (!bytes) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Drag & drop
+function dragOver(e) { e.preventDefault(); e.target.closest('.drag-drop').classList.add('active'); }
+function dragLeave(e) { e.target.closest('.drag-drop').classList.remove('active'); }
+function dropFile(e, type) {
+  e.preventDefault(); e.target.closest('.drag-drop').classList.remove('active');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFileSelect({ target: { files: [file] } }, type);
+}
+function handleFileSelect(e, type) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', type);
+    formData.append('proto', document.getElementById(type === 'vpn1' ? 'vpn1Proto' : 'vpn2Proto').value);
+    const r = await fetch('/api/config/upload', { method: 'POST', body: formData });
+    if (r.ok) { if (type === 'vpn1') await loadVpn1Configs(); else await loadVpn2Configs(); }
+    else alert('Upload failed: ' + await r.text());
+  };
+  reader.readAsText(file);
+}
+
+async function uploadConfig(type) {
+  const fileInput = document.getElementById(type === 'vpn1' ? 'vpn1File' : 'vpn2File');
+  if (fileInput.files[0]) { handleFileSelect({ target: fileInput }, type); return; }
+  if (type === 'vpn2') {
+    const url = document.getElementById('vpn2Url').value.trim();
+    if (url) {
+      const proto = document.getElementById('vpn2Proto').value;
+      const r = await fetch('/api/config/import-url', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url, proto, type: 'vpn2' }) });
+      if (r.ok) await loadVpn2Configs(); else alert('Import failed: ' + await r.text());
+    }
+  }
+}
+
+async function useConfig(type, path) {
+  if (!confirm('Use this config as active?')) return;
+  const r = await fetch('/api/config/use', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type, path }) });
+  if (r.ok) { if (type === 'vpn1') await loadVpn1Configs(); else if (type === 'vpn2') await loadVpn2Configs(); await loadBridgeDetail(); }
+  else alert('Failed: ' + await r.text());
+}
+
+async function deleteConfig(type, path) {
+  if (!confirm('Delete this config?')) return;
+  const r = await fetch('/api/config/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type, path }) });
+  if (r.ok) { if (type === 'vpn1') await loadVpn1Configs(); else if (type === 'vpn2') await loadVpn2Configs(); else await loadAutoConfigs(); }
+  else alert('Failed: ' + await r.text());
+}
+
+async function backupOnionKeys() {
+  const r = await fetch('/api/tor/backup-keys', { method: 'POST' });
+  showToast(r.ok ? 'Keys backed up successfully' : 'Failed: ' + await r.text(), r.ok ? 'ok' : 'err');
+}
+
+async function restoreOnionKeys() {
+  if (!confirm('Restore onion keys from backup? This will overwrite current keys.')) return;
+  const r = await fetch('/api/tor/restore-keys', { method: 'POST' });
+  showToast(r.ok ? 'Keys restored successfully' : 'Failed: ' + await r.text(), r.ok ? 'ok' : 'err');
+}
+
+async function rotateOnionKeys() {
+  showToast('Key rotation requires secure distribution protocol (not yet implemented)', 'warn');
+}
+
+async function saveAutoConfig() {
+  const watchDir = document.getElementById('watchDir').value;
+  const urls = document.getElementById('subscriptionUrls').value.split('\n').filter(u => u.trim());
+  const interval = parseInt(document.getElementById('scanInterval').value) || 60;
+  const r = await fetch('/api/config/auto', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ watch_dir: watchDir, subscriptions: urls, interval }) });
+  showToast(r.ok ? 'Settings saved' : 'Failed: ' + await r.text(), r.ok ? 'ok' : 'err');
+}
+
+async function runAutoDiscovery() {
+  const r = await fetch('/api/config/scan', { method: 'POST' });
+  if (r.ok) await loadAutoConfigs(); else alert('Scan failed: ' + await r.text());
+}
+
+async function fetchSubscriptions() {
+  const r = await fetch('/api/config/fetch-subs', { method: 'POST' });
+  if (r.ok) { await loadVpn1Configs(); await loadVpn2Configs(); await loadAutoConfigs(); }
+  else alert('Fetch failed: ' + await r.text());
+}
+
+async function saveSystemConfig() {
+  const config = {
+    api_listen: document.getElementById('apiListen').value,
+    data_dir: document.getElementById('dataDir').value,
+    log_level: document.getElementById('logLevel').value,
+    poll_interval: parseInt(document.getElementById('pollInterval').value) || 60
+  };
+  const r = await fetch('/api/config/system', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config) });
+  showToast(r.ok ? 'System config saved' : 'Failed: ' + await r.text(), r.ok ? 'ok' : 'err');
+}
+
+async function restartNode() {
+  if (!confirm('Restart the entire node?')) return;
+  const r = await fetch('/api/admin/restart', { method: 'POST' });
+  showToast(r.ok ? 'Node restart initiated' : 'Failed', r.ok ? 'ok' : 'err');
+}
+
+async function wipeAllConfigs() {
+  if (!confirm('⚠️ This will DELETE ALL VPN configs and keys. Are you sure?')) return;
+  if (!confirm('This action is IRREVERSIBLE. Type YES to confirm.')) return;
+  const r = await fetch('/api/config/wipe', { method: 'POST' });
+  showToast(r.ok ? 'All configs wiped' : 'Failed', r.ok ? 'ok' : 'err');
+}
+
+async function resetToDefaults() {
+  if (!confirm('Reset to factory defaults? This will remove all custom configs.')) return;
+  const r = await fetch('/api/config/reset', { method: 'POST' });
+  showToast(r.ok ? 'Reset to defaults' : 'Failed', r.ok ? 'ok' : 'err');
+}
+
+// ========== LOGS ==========
+async function loadLogs() {
+  const r = await fetchJSON('/api/logs?filter=' + logFilter + '&limit=200');
+  const container = document.getElementById('logContainer');
+  if (r._error || !r.logs) { container.innerHTML = '<div class="muted">Error loading logs</div>'; return; }
+  container.innerHTML = r.logs.map(l => `
+    <div class="log-entry">
+      <span class="log-time">${new Date(l.ts * 1000).toLocaleTimeString()}</span>
+      <span class="log-source">[${l.source}]</span>
+      <span class="log-level-${l.level.toLowerCase()}">[${l.level}]</span>
+      ${l.msg}
+    </div>
+  `).join('');
+}
+
+// ========== INIT ==========
+setInterval(loadAll, 30000);
+loadAll();
+
+document.getElementById('tabBridgeBtn').onclick = () => { showTab('bridge'); loadBridgeDetail(); };
+document.getElementById('tabConfigBtn').onclick = () => { showTab('config'); loadConfigTab(); };
+document.getElementById('tabMonitorBtn').onclick = () => { showTab('monitor'); };
+
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === '1') { showTab('monitor'); }
+  if (e.ctrlKey && e.key === '2') { showTab('bridge'); loadBridgeDetail(); }
+  if (e.ctrlKey && e.key === '3') { showTab('config'); loadConfigTab(); }
+});
+</script>
+</body>
+</html>

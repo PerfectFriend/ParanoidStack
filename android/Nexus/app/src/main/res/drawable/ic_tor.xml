@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tor onion icon — 24dp notification icon (must be white/transparent only) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Outer shield -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M12,2 L3,6 L3,12 C3,17.55 6.84,22.74 12,24 C17.16,22.74 21,17.55 21,12 L21,6 Z" />
+
+    <!-- Inner cutout -->
+    <path
+        android:fillColor="#BF5FFF"
+        android:pathData="M12,4.5 L5,7.8 L5,12 C5,16.2 8,20.2 12,21.5 C16,20.2 19,16.2 19,12 L19,7.8 Z" />
+
+    <!-- Lock icon -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M12,9 C10.9,9 10,9.9 10,11 L10,12 L14,12 L14,11 C14,9.9 13.1,9 12,9 Z" />
+    
+    <!-- Lock rectangle (as path) -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M9.5,12 L14.5,12 L14.5,16 L9.5,16 Z" />
+
+</vector>

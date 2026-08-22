@@ -1,0 +1,262 @@
+# NexusChat CI/CD Pipeline
+
+name: NexusChat CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    tags: ['v*']
+  pull_request:
+    branches: [main, develop]
+
+env:
+  GRADLE_OPTS: "-Xmx4096m -XX:MaxMetaspaceSize=1024m -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.configureondemand=true"
+  JAVA_VERSION: "17"
+
+jobs:
+  # ─────────────────────────────────────────────────────────────
+  # Lint & Static Analysis
+  # ─────────────────────────────────────────────────────────────
+  lint:
+    name: Lint & Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Lint
+        run: ./gradlew lintDebug --no-daemon
+
+      - name: Upload Lint Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-debug.html
+
+  # ─────────────────────────────────────────────────────────────
+  # Unit Tests
+  # ─────────────────────────────────────────────────────────────
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
+
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-report
+          path: app/build/reports/tests/testDebugUnitTest/
+
+  # ─────────────────────────────────────────────────────────────
+  # Build Debug APK
+  # ─────────────────────────────────────────────────────────────
+  build-debug:
+    name: Build Debug APK
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+  # ─────────────────────────────────────────────────────────────
+  # Build Release APK (on tags only)
+  # ─────────────────────────────────────────────────────────────
+  build-release:
+    name: Build Release APK
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Decode Keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.KEY_PASS }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > nexuschat.keystore
+          echo "keystore decoded"
+
+      - name: Build Release APK
+        run: |
+          ./gradlew assembleRelease --no-daemon \
+            -PKEYSTORE_PATH=nexuschat.keystore \
+            -PKEYSTORE_PASS=${{ secrets.KEYSTORE_PASS }} \
+            -PKEY_ALIAS=${{ secrets.KEY_ALIAS }} \
+            -PKEY_PASS=${{ secrets.KEY_PASS }}
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: app/build/outputs/apk/release/app-release.apk
+
+  # ─────────────────────────────────────────────────────────────
+  # APK Size Check
+  # ─────────────────────────────────────────────────────────────
+  size-check:
+    name: APK Size Check
+    needs: build-debug
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Debug APK
+        uses: actions/download-artifact@v4
+        with:
+          name: app-debug-apk
+          path: artifacts
+
+      - name: Check APK Size
+        run: |
+          APK_PATH=$(find artifacts -name "*.apk" | head -1)
+          SIZE=$(stat -c%s "$APK_PATH")
+          SIZE_MB=$((SIZE / 1024 / 1024))
+          echo "APK Size: ${SIZE_MB} MB"
+          if [ $SIZE_MB -gt 100 ]; then
+            echo "::warning::APK size (${SIZE_MB}MB) exceeds 100MB limit"
+          fi
+
+  # ─────────────────────────────────────────────────────────────
+  # Dependency Check (OWASP)
+  # ─────────────────────────────────────────────────────────────
+  dependency-check:
+    name: OWASP Dependency Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Dependency Check
+        run: ./gradlew dependencyCheckAnalyze --no-daemon
+
+      - name: Upload Dependency Check Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-check-report
+          path: app/build/reports/dependency-check-report.html
+
+  # ─────────────────────────────────────────────────────────────
+  # Release Notes Generator
+  # ─────────────────────────────────────────────────────────────
+  release:
+    name: Create Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build-release, size-check]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Release APK
+        uses: actions/download-artifact@v4
+        with:
+          name: app-release-apk
+          path: artifacts
+
+      - name: Generate Release Notes
+        run: |
+          cat > release_notes.md << 'EOF'
+          # NexusChat ${{ github.ref_name }}
+
+          ## Changes
+          ${{ github.event.head_commit.message }}
+
+          ## Security
+          - All traffic routed through Tor SOCKS5
+          - End-to-end encryption (X25519 + XSalsa20-Poly1305)
+          - Encrypted SharedPreferences (Android Keystore)
+          - Biometric authentication support
+          - Panic mode for emergency data wipe
+
+          ## Download
+          - [app-release.apk](artifacts/app-release.apk) - Release build
+          - [SHA256 checksum](artifacts/app-release.apk.sha256)
+
+          ## Verification
+          \`\`\`bash
+          sha256sum app-release.apk
+          \`\`\`
+          EOF
+
+      - name: Create SHA256 Checksum
+        run: |
+          cd artifacts
+          sha256sum app-release.apk > app-release.apk.sha256
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/app-release.apk
+            artifacts/app-release.apk.sha256
+          body_path: release_notes.md
+          draft: false
+          prerelease: false

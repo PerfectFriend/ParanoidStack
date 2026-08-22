@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- App-private internal storage for encrypted files -->
+    <files-path name="encrypted_files" path="xftp/" />
+    <files-path name="tor_data"         path="tor_data/" />
+    <cache-path  name="cache"           path="." />
+</paths>

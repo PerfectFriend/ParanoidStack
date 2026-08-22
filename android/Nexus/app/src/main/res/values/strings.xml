@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NexusChat</string>
+    <string name="tor_notification_title">Tor VPN Active</string>
+    <string name="smp_notification_title">SMP Server</string>
+    <string name="biometric_prompt_title">Unlock NexusChat</string>
+    <string name="biometric_prompt_subtitle">Use biometric or device PIN</string>
+    <string name="channel_tor_name">Tor VPN</string>
+    <string name="channel_smp_name">SMP Server</string>
+    <string name="channel_messages_name">Messages</string>
+    <string name="channel_calls_name">Voice Calls</string>
+</resources>

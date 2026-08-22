@@ -1,0 +1,93 @@
+{
+  "projects": {
+    "NexusChat": {
+      "root": "C:\\Temp\\Nexus",
+      "build": {
+        "command": ".\\gradlew.bat assembleDebug",
+        "javaHome": "C:/Temp/jdk17/jdk-17.0.19+10",
+        "apkOutput": "C:\\ApkExport\\Nexus.apk",
+        "apkSize": "70 MB"
+      },
+      "telegramBot": {
+        "token": "8959295276:AAGRBWFvMr2eRDp6-17enCZpsxW4fjq4h9c",
+        "chatId": "143293811"
+      },
+      "bugsFixed": [
+        "ChainProxy.kt:285 — removed +1 in SOCKS5 DOMAIN BND.ADDR",
+        "BridgeOrchestrator.kt:91 — replaced dead .let{} with direct .stop()",
+        "app.js:1119 — panic mode pi7 no-op, added DEFAULT_CONFIG",
+        "MainActivity.kt:332 — added BLUETOOTH_CONNECT + rationale dialog + JS callback",
+        "app.js:1355 — added permissionsResult listener",
+        "app/build.gradle — auto-copy APK to C:\\ApkExport\\Nexus.apk",
+        "TorService.kt:135 — added onStartCommand returning START_STICKY",
+        "NexusVpnService.kt — full rewrite: TCP-to-SOCKS5 relay via Tor",
+        "Bridges.kt:413 — SystemBridge VPN methods with VpnService.prepare()",
+        "index.html:1134 — VPN toggle UI, app.js:920 — toggleBridgeVpn handler",
+        "TrafficPadding.kt:108 — stripPadding rewritten (was returning 1 byte)",
+        "DnsOverTor.kt:132 — 4-byte DNS TCP prefix -> 2-byte (RFC 1035)",
+        "DnsOverTor.kt:238 — copyOfRange off-by-one + crash risk fixed",
+        "Bip39Wallet.kt:234 — entropy calc fix (was generating 132 words for generate(12))",
+        "NexusVpnService.kt:228 — connKey missing dstPort, changed to ConnKey data class",
+        "CryptoManager.kt:133 — partial read in decryptFile -> readFully loop",
+        "DnsOverTor.kt:102-155 — socket leak in resolveViaTor (finally block)",
+        "DnsOverTor.kt:157-175 — DatagramSocket leak in resolveDirect (finally block)",
+        "MainActivity.kt:43,474 — CoroutineScope leak (scope.cancel in onDestroy)",
+        "app.js:869 — XSS in appendLog (innerHTML -> textContent via createElement)",
+        "app.js:807 — monitorCallQuality interval leak (stored ID, cleared in endCall)",
+        "app.js:823 — handleIncomingSdp double JSON.parse crash (accepts object/string)",
+        "app.js:837 — onSmpMessage double-processes call offers (offer skipped from receiveMessage)",
+        "app.js:190-196 — PIN written to localStorage in plaintext (removed)",
+        "app.js:1310 — XSS in walletSign display (innerHTML -> textContent)",
+        "index.html:1111 — class=\"input\" typo -> class=\"field\""
+      ],
+      "bugsUnfixed": [
+        "C-1: WebView JS bridges expose raw crypto material (WalletBridge returns mnemonic/keys to JS)",
+        "C-2: KeystoreBridge.clearKeystore() wipes all Android Keystore entries",
+        "C-3: BinaryDownloader hash verification uses placeholder zeros",
+        "C-6: DoubleRatchet broken skip-message-keys logic (decryption fails after DH ratchet)",
+        "H-2: WebRtcBridge scope never cancelled",
+        "H-4: TorService process reader not cancellable (forEachLine)",
+        "H-5: TorService readThread never joined/cleaned up",
+        "H-6: SmpServerService infinite loop on broken socket",
+        "H-7: Obfs4Transport partial reads in handshake",
+        "H-8: V2Ray/XRay JSON injection via unescaped config values",
+        "H-9: WalletBridge can generate wallet via JS without user confirmation",
+        "H-10: MainActivity intent data passed to JS without validation",
+        "M-1: DomainFronting OkHttpClient per request (no connection reuse)",
+        "M-2: AudioRelay reconnect recursion could exhaust stack",
+        "M-4: ChainProxy.pipe() no I/O timeout",
+        "M-5: SmpServerService race on messageListeners",
+        "M-7: BootReceiver starts services without permission check",
+        "JS #9: Tor connectivity test is fake (fetch doesn't use SOCKS5)",
+        "JS #11: WebSocket reconnection cascade (old onclose after new connection)"
+      ]
+    },
+    "MatrixX": {
+      "root": "D:\\PROJECTS\\MatrixX",
+      "build": {
+        "command": ".\\gradlew assembleDebug --no-daemon",
+        "javaHome": "C:\\Program Files\\Android\\Android Studio\\jbr",
+        "apkOutput": "C:\\ApkExport\\app-debug.apk",
+        "apkSize": "166 MB"
+      },
+      "androidSdk": "C:\\Users\\yusya\\AppData\\Local\\Android\\Sdk",
+      "telegramBot": {
+        "token": "8933708843:AAGiADifu4i7jW0xnvLG4GXJCt2MhGpLOec",
+        "chatId": "143293811"
+      },
+      "bugsFixed": [
+        "GameEngine.kt — findReachablePathsFrom race condition",
+        "MemfdExec.kt — fd-close race",
+        "GameViewModel.kt — 4 NPE fixes",
+        "GameViewModel.kt — onCleared cleanup",
+        "GameViewModel.kt — 4 silent catches -> writeCrashLog()",
+        "CryptoManager.kt — AES-256-GCM seed encryption via AndroidKeyStore",
+        "DoubleRatchet.kt — initializeState chain key derivation",
+        "ExampleRobolectricTest — wrong expected app name"
+      ],
+      "testCount": 66,
+      "testPass": 66
+    }
+  },
+  "lastBuildStatus": "SUCCESS"
+}
