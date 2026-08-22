@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <!-- Local SOCKS5 proxy chain (Tor :9050, V2Ray :10808) -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">localhost</domain>
+        <!-- TUN interface addresses (FoxrayVpnService) -->
+        <domain includeSubdomains="true">10.0.0.0</domain>
+        <domain includeSubdomains="true">172.16.0.0</domain>
+        <domain includeSubdomains="true">192.168.0.0</domain>
+    </domain-config>
+    <!-- Wildcard .onion is not directly supported by Android's domain matcher.
+         Onion connections go through SOCKS5 proxy to 127.0.0.1, so they're
+         covered by the localhost config above. -->
+</network-security-config>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">N3</string>
+    <string name="status_offline">офлайн</string>
+    <string name="status_tor">тор</string>
+    <string name="status_ready">готов</string>
+    <string name="tab_chat">Чат</string>
+    <string name="tab_tor">Тор</string>
+    <string name="tab_crypto">Крипто</string>
+    <string name="tab_bridge">Мосты</string>
+    <string name="tab_log">Лог</string>
+    <string name="bridge_title">Мосты</string>
+    <string name="bridge_add_ovpn">Добавить OpenVPN</string>
+    <string name="bridge_add_wg">Добавить WireGuard</string>
+    <string name="bridge_add_v2ray">Добавить V2Ray</string>
+    <string name="bridge_import">Импорт конфига</string>
+    <string name="bridge_status">Статус</string>
+    <string name="bridge_enabled">Включён</string>
+    <string name="bridge_disabled">Отключён</string>
+    <string name="bridge_active">Активен</string>
+    <string name="bridge_error">Ошибка</string>
+    <string name="bridge_no_configs">Нет конфигов мостов</string>
+    <string name="bridge_chain_build">Собрать цепь</string>
+    <string name="bridge_test_all">Тест всех</string>
+    <string name="bridge_chain_status">Активная цепь</string>
+    <string name="bridge_chain_none">Не собрана</string>
+    <string name="profile_title">Идентичность</string>
+    <string name="profile_create">Создать идентичность</string>
+    <string name="profile_enter_words">Введите 5 слов (макс. 16 символов каждое)</string>
+    <string name="profile_word_label">Слово %d</string>
+    <string name="profile_generate">Создать сид</string>
+    <string name="profile_seed_phrase">Ваша сид-фраза (сохраните её!)</string>
+    <string name="profile_warning">Только вы отвечаете за свои ключи. Запишите эту сид-фразу. При потере идентичность невосстановима.</string>
+    <string name="profile_verify_title">Проверка сида</string>
+    <string name="profile_verify_prompt">Введите слово #%d</string>
+    <string name="profile_verify_error">Неверное слово. Попробуйте снова.</string>
+    <string name="profile_loaded">Идентичность загружена</string>
+    <string name="profile_created">Идентичность создана</string>
+    <string name="boot_checking">Проверка сети…</string>
+    <string name="boot_bridges">Тестирование мостов…</string>
+    <string name="boot_chain">Сборка цепи…</string>
+    <string name="boot_simplex">Тестирование SMP…</string>
+    <string name="boot_ready">Терминал готов</string>
+    <string name="boot_failed">Ошибка загрузки: %s</string>
+</resources>

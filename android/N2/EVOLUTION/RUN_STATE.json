@@ -1,0 +1,30 @@
+{
+  "run_id": "20260720-R1",
+  "project_root": "c:/Temp/n2",
+  "project_name": "Not Gammon",
+  "cycle": 4,
+  "max_cycles": 20,
+  "status": "running",
+  "active_layer": "shared",
+  "focus_paths": [
+    "app/src/main/java/.../ui/screens/chat/SimpleXChatScreen.kt",
+    "app/src/main/java/.../ui/screens/chat/SaveCryptoKeyDialog.kt"
+  ],
+  "frozen_paths": [
+    "app/src/main/java/.../ui/viewmodels/SecurityViewModel.kt",
+    "app/src/main/java/.../ui/viewmodels/SettingsViewModel.kt",
+    "app/src/main/java/.../ui/screens/chat/SaveCryptoKeyDialog.kt"
+  ],
+  "next_steps": [
+    "Cycle 5: Extract backup/export/import dialogs from SimpleXChatScreen (6C.2)",
+    "Cycle 6: Extract chat message list into SimpleXChatMessagesPane (6C.3)",
+    "Cycle 7: Test expansion — security + protocols (6D)"
+  ],
+  "blockers": [],
+  "last_deploy": {
+    "cycle": 4,
+    "status": "pending-verify",
+    "summary": "Extracted SaveCryptoKeyDialog.kt from SimpleXChatScreen (3190→3085 lines)"
+  },
+  "token_budget_notes": "skip frozen; research max 3 sources/cycle"
+}

@@ -1,0 +1,29 @@
+*.iml
+.gradle
+.kotlin
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+.env
+debug.keystore
+
+# Large binary assets downloaded at build time
+/app/src/main/assets/bin/
+
+# JVM crash / replay logs
+hs_err_pid*.log
+replay_pid*.log
+
+# Orphaned temp files
+temp_*.kt
+

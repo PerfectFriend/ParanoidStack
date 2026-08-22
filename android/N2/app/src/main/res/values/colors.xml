@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_calculator_background">#FF4A90D9</color>
+    <color name="ic_music_background">#FFE94A4A</color>
+    <color name="ic_tic_background">#FF4CAF50</color>
+    <color name="mimicry_accent">#FF1A1A2E</color>
+</resources>

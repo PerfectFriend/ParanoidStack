@@ -1,0 +1,6 @@
+-keep class com.n3.app.bridges.** { @android.webkit.JavascriptInterface <methods>; }
+-keep class com.n3.app.services.** { *; }
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn com.google.crypto.tink.**
+-dontwarn org.bouncycastle.**

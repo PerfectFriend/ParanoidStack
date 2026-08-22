@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">N3</string>
+    <string name="status_offline">offline</string>
+    <string name="status_tor">tor</string>
+    <string name="status_ready">ready</string>
+    <string name="tab_chat">Chat</string>
+    <string name="tab_tor">Tor</string>
+    <string name="tab_crypto">Crypto</string>
+    <string name="tab_bridge">Bridge</string>
+    <string name="tab_log">Log</string>
+    <string name="bridge_title">Bridge</string>
+    <string name="bridge_add_ovpn">Add OpenVPN</string>
+    <string name="bridge_add_wg">Add WireGuard</string>
+    <string name="bridge_add_v2ray">Add V2Ray</string>
+    <string name="bridge_import">Import Config</string>
+    <string name="bridge_status">Status</string>
+    <string name="bridge_enabled">Enabled</string>
+    <string name="bridge_disabled">Disabled</string>
+    <string name="bridge_active">Active</string>
+    <string name="bridge_error">Error</string>
+    <string name="bridge_no_configs">No bridge configs</string>
+    <string name="bridge_chain_build">Build Chain</string>
+    <string name="bridge_test_all">Test All</string>
+    <string name="bridge_chain_status">Active Chain</string>
+    <string name="bridge_chain_none">Not assembled</string>
+    <string name="profile_title">Identity</string>
+    <string name="profile_create">Create Identity</string>
+    <string name="profile_enter_words">Enter 5 words (max 16 chars each)</string>
+    <string name="profile_word_label">Word %d</string>
+    <string name="profile_generate">Generate Seed</string>
+    <string name="profile_seed_phrase">Your seed phrase (save it!)</string>
+    <string name="profile_warning">You alone are responsible for your keys. Write down this seed phrase. If lost, your identity is unrecoverable.</string>
+    <string name="profile_verify_title">Verify Seed</string>
+    <string name="profile_verify_prompt">Enter word #%d</string>
+    <string name="profile_verify_error">Wrong word. Try again.</string>
+    <string name="profile_loaded">Identity loaded</string>
+    <string name="profile_created">Identity created</string>
+    <string name="boot_checking">Checking network…</string>
+    <string name="boot_bridges">Testing bridges…</string>
+    <string name="boot_chain">Assembling chain…</string>
+    <string name="boot_simplex">Testing SMP…</string>
+    <string name="boot_ready">Terminal ready</string>
+    <string name="boot_failed">Boot failed: %s</string>
+</resources>

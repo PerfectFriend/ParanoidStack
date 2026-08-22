@@ -1,0 +1,311 @@
+<!DOCTYPE html><html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0D1117">
+<link rel="manifest" href="manifest.json">
+<title>N3</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0D1117;color:#E6EDF3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;overflow:hidden;height:100vh}
+#app{display:flex;flex-direction:column;height:100vh;position:relative}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#161B22;border-bottom:1px solid #30363D}
+header h1{font-size:18px;font-weight:600}
+header .status{font-size:11px;color:#8B949E}
+main{flex:1;overflow-y:auto;padding:16px}
+.tab-bar{display:flex;background:#161B22;border-top:1px solid #30363D}
+.tab-bar button{flex:1;padding:12px;border:none;background:transparent;color:#8B949E;font-size:13px;cursor:pointer;transition:all .2s;font-family:inherit}
+.tab-bar button.active{color:#58A6FF;border-top:2px solid #58A6FF}
+.panel{display:none}.panel.active{display:block}
+.card{background:#161B22;border-radius:8px;padding:16px;margin-bottom:12px;border:1px solid #30363D}
+.card h3{font-size:14px;margin-bottom:8px;color:#58A6FF}
+.card .row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}
+.card .val{color:#E6EDF3;word-break:break-all}
+label{display:block;font-size:12px;color:#8B949E;margin-bottom:4px;margin-top:8px}
+input,select,textarea{width:100%;padding:8px 10px;background:#0D1117;border:1px solid #30363D;border-radius:6px;color:#E6EDF3;font-size:13px;outline:none;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:#58A6FF}
+textarea{resize:vertical;min-height:60px;font-family:monospace;font-size:12px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:none;border-radius:6px;font-size:13px;cursor:pointer;transition:opacity .2s;margin-top:8px;font-family:inherit}
+.btn:active{opacity:.7}.btn-primary{background:#58A6FF;color:#0D1117}
+.btn-secondary{background:#21262D;color:#E6EDF3;border:1px solid #30363D}
+.btn-danger{background:#F85149;color:#fff}.btn-success{background:#3FB950;color:#fff}.btn-warning{background:#D29922;color:#0D1117}
+.btn-sm{padding:4px 10px;font-size:12px}.mt8{margin-top:8px}.mb8{margin-bottom:8px}.gap8{display:flex;gap:8px}
+.flex{display:flex}.between{justify-content:space-between}.center{align-items:center}.wrap{flex-wrap:wrap}.grow{flex:1}
+.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#log{font-family:monospace;font-size:11px;color:#8B949E;max-height:200px;overflow-y:auto;padding:8px;background:#0D1117;border-radius:6px;margin-top:8px;line-height:1.5}
+#log div{border-bottom:1px solid #21262D;padding:2px 0}
+#messages{max-height:55vh;overflow-y:auto}
+.msg{padding:8px 12px;margin-bottom:6px;border-radius:8px;font-size:13px;line-height:1.4;word-break:break-word}
+.msg-in{background:#21262D;margin-right:40px}
+.msg-out{background:#1F3A5F;margin-left:40px}
+.msg .time{font-size:10px;color:#8B949E;margin-top:4px}
+.msg .del-status{font-size:9px;color:#8B949E;margin-top:2px}
+.msg .attach{display:flex;align-items:center;gap:8px;padding:6px;margin-top:4px;background:#0D1117;border-radius:6px;font-size:12px;cursor:pointer}
+.msg .attach:hover{background:#161B22}
+.msg .attach .icon{font-size:18px}
+.msg .attach .info{flex:1}
+.msg .attach .name{color:#58A6FF;word-break:break-all}
+.msg .attach .size{color:#8B949E;font-size:10px}
+.msg .attach img{max-width:200px;max-height:200px;border-radius:6px;display:block;margin:4px 0}
+.msg .voice{display:flex;align-items:center;gap:8px;padding:8px;background:#21262D;border-radius:8px;cursor:pointer;margin-top:4px}
+.msg .voice:hover{background:#30363D}
+.msg .voice .play{font-size:16px;color:#58A6FF}
+.msg .voice .wave{height:24px;flex:1;background:linear-gradient(90deg,#58A6FF 0%,#58A6FF 40%,#30363D 40%,#30363D 100%);border-radius:3px}
+.msg .voice .dur{font-size:11px;color:#8B949E}
+.msg.expiring{border-left:2px solid #D29922}
+.msg.expired{opacity:.4}
+.cont-list{max-height:60vh;overflow-y:auto}
+.cont-item{display:flex;align-items:center;gap:8px;padding:10px;background:#0D1117;border:1px solid #30363D;border-radius:6px;margin-bottom:6px;cursor:pointer;transition:border .2s}
+.cont-item:hover{border-color:#58A6FF}
+.cont-item .avatar{width:36px;height:36px;border-radius:50%;background:#1F3A5F;display:flex;align-items:center;justify-content:center;font-size:14px;color:#58A6FF;flex-shrink:0}
+.cont-item .cinfo{flex:1;min-width:0}
+.cont-item .cname{font-size:13px;font-weight:500}
+.cont-item .cmeta{font-size:11px;color:#8B949E}
+.cont-item .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-online{background:#3FB950}.status-offline{background:#30363D}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:100;display:flex;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
+.overlay .modal{background:#161B22;border:1px solid #30363D;border-radius:12px;padding:24px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto}
+.overlay .modal h2{font-size:18px;margin-bottom:12px;color:#58A6FF}
+.overlay .modal p{font-size:13px;color:#8B949E;margin-bottom:12px;line-height:1.5}
+.overlay .modal .seed-box{background:#0D1117;border:1px solid #30363D;border-radius:6px;padding:12px;font-family:monospace;font-size:13px;line-height:1.6;word-break:break-all;margin:8px 0;user-select:all}
+.overlay .modal .warning{background:#3D1F1F;border:1px solid #F85149;border-radius:6px;padding:10px;font-size:12px;color:#F85149;margin:8px 0}
+.overlay .modal .word-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.overlay .modal .word-row label{width:60px;margin:0;flex-shrink:0}
+.overlay .modal .word-row input{flex:1}
+.overlay .progress{text-align:center;padding:20px}
+.overlay .progress .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin:4px;background:#30363D}
+.overlay .progress .dot.done{background:#3FB950}
+.overlay .progress .dot.active{background:#58A6FF;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.overlay .boot-msg{font-size:14px;color:#E6EDF3;margin-top:12px}
+.bridge-item{background:#0D1117;border:1px solid #30363D;border-radius:6px;padding:10px;margin-bottom:8px}
+.bridge-item .bhead{display:flex;align-items:center;gap:8px}
+.bridge-item .bhead .btype{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px}
+.btype-OPENVPN{background:#2D4A22;color:#3FB950}.btype-WIREGUARD{background:#1F3A5F;color:#58A6FF}
+.btype-V2RAY{background:#3D1F1F;color:#F85149}.btype-TOR{background:#4A2D1F;color:#D29922}
+.btype-DIRECT{background:#21262D;color:#8B949E}
+.key-box{background:#0D1117;border:1px solid #30363D;border-radius:6px;padding:8px;font-family:monospace;font-size:11px;word-break:break-all;user-select:all;margin:4px 0}
+</style>
+</head><body>
+<div id="app">
+<header><h1>N3</h1><div class="status" id="status">offline</div></header>
+<main>
+<div id="panel-chat" class="panel active">
+  <div id="chatHeader" style="display:none;padding:4px 0 8px;font-size:13px">
+    <span style="color:#58A6FF;cursor:pointer" onclick="backToContacts()">←</span>
+    <span id="chatWith" style="font-weight:500"></span>
+    <div style="float:right;display:flex;gap:6px;align-items:center">
+      <input id="msgSearchInput" placeholder="Search..." style="width:120px;font-size:11px;padding:3px 6px;display:none"
+        oninput="searchMessages()" onblur="if(!this.value)this.style.display='none'">
+      <span style="font-size:11px;color:#8B949E;cursor:pointer" onclick="document.getElementById('msgSearchInput').style.display='';document.getElementById('msgSearchInput').focus()">[..]</span>
+    </div>
+  </div>
+  <div id="typingIndicator" style="font-size:11px;color:#8B949E;font-style:italic;height:16px;padding:0 4px"></div>
+  <div id="messages"></div>
+  <div id="reactionPicker" style="display:none;gap:4px;padding:6px;background:#21262D;border-radius:8px;margin:4px 0">
+    <span style="font-size:20px;cursor:pointer;padding:2px" onclick="sendReaction(this.parentElement.dataset.msgId,'👍')">👍</span>
+    <span style="font-size:20px;cursor:pointer;padding:2px" onclick="sendReaction(this.parentElement.dataset.msgId,'❤️')">❤️</span>
+    <span style="font-size:20px;cursor:pointer;padding:2px" onclick="sendReaction(this.parentElement.dataset.msgId,'😂')">😂</span>
+    <span style="font-size:20px;cursor:pointer;padding:2px" onclick="sendReaction(this.parentElement.dataset.msgId,'😮')">😮</span>
+    <span style="font-size:20px;cursor:pointer;padding:2px" onclick="sendReaction(this.parentElement.dataset.msgId,'😢')">😢</span>
+    <span style="font-size:20px;cursor:pointer;padding:2px" onclick="sendReaction(this.parentElement.dataset.msgId,'🙏')">🙏</span>
+  </div>
+  <div id="chatInputArea" style="display:none" class="gap8" style="margin-top:12px;position:sticky;bottom:0;background:#0D1117;padding:8px 0">
+    <select id="expireSelect" style="width:auto;font-size:11px;padding:4px">
+      <option value="0">Off</option><option value="30">30s</option><option value="300">5m</option><option value="3600">1h</option><option value="86400">24h</option>
+    </select>
+    <textarea id="msgInput" placeholder="Type a message..." style="min-height:40px;flex:1" rows="1"></textarea>
+    <input type="file" id="fileInput" style="display:none" onchange="sendFile(this)">
+    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('fileInput').click()" title="Attach file">+</button>
+    <button class="btn btn-secondary btn-sm" id="voiceBtn" onclick="toggleVoiceRecord()" style="color:#F85149" title="Record voice">[mic]</button>
+    <div id="voiceTimer" style="display:none;font-size:12px;color:#F85149;align-items:center">◉ <span id="voiceSecs">0</span>s</div>
+    <button class="btn btn-primary" onclick="sendMsg()">Send</button>
+  </div>
+</div>
+<div id="panel-contacts" class="panel">
+  <div class="card"><h3>My Identity</h3>
+    <div class="row"><span>Public Key</span></div>
+    <div class="key-box" id="myPubKey">-</div>
+    <div class="row"><span>Fingerprint</span><span class="val" id="myFingerprint">-</span></div>
+    <div class="gap8 mt8"><button class="btn btn-secondary btn-sm" onclick="copyMyKey()">Copy Key</button>
+    <button class="btn btn-primary btn-sm" onclick="shareInvite()">Share Invite</button></div>
+  </div>
+  <div class="card"><h3>Contacts <span id="contactCount" style="color:#8B949E;font-weight:400;font-size:12px"></span></h3>
+    <div class="gap8 mb8"><input id="contactSearch" placeholder="Search contacts..." oninput="searchContacts()">
+    <button class="btn btn-primary btn-sm" onclick="showAddContact()">+ Add</button></div>
+    <div class="cont-list" id="contactList"></div>
+  </div>
+</div>
+<div id="panel-tor" class="panel">
+  <div class="card"><h3>Network Health</h3>
+    <div class="row"><span>Tor</span><span class="val" id="torHealth" style="color:#D29922">checking...</span></div>
+    <div class="row"><span>Exit IP</span><span class="val" id="torExitIp">-</span></div>
+    <div class="row"><span>Onion</span><span class="val" id="torOnion">-</span></div>
+    <div class="row"><span>SOCKS5</span><span class="val" id="torSocks">9050</span></div>
+    <div class="row"><span>DL</span><span class="val" id="bwDown">0 B</span></div>
+    <div class="row"><span>UL</span><span class="val" id="bwUp">0 B</span></div>
+    <div class="row"><span>Rate</span><span class="val" id="bwRate">0 B/s</span></div>
+    <button class="btn btn-secondary btn-sm" onclick="checkTor()">Refresh</button>
+  </div>
+  <div class="card"><h3>Bridge Chain <span id="chainRotationStatus" style="font-weight:400;font-size:11px;color:#8B949E"></span></h3>
+    <div class="row"><span>Active chain</span><span class="val" id="chainStatus">Not assembled</span></div>
+    <div class="row"><span>Latency</span><span class="val" id="chainLatency">-</span></div>
+    <div class="row" id="chainHealthRow" style="display:none"><span>Health</span><span class="val" id="chainHealth"></span></div>
+    <div class="gap8 mt8"><button class="btn btn-primary btn-sm" onclick="buildChain()">Rebuild</button></div>
+  </div>
+  <div class="card"><h3>SMP Server</h3>
+    <label>Host</label><input id="smpHost" placeholder="host.onion or example.com">
+    <label>Port</label><input id="smpPort" value="5223">
+    <button class="btn btn-primary btn-sm" onclick="connectSmp()">Connect</button>
+    <div class="row mt8"><span>Status</span><span class="val" id="smpStatus">disconnected</span></div>
+  </div>
+</div>
+<div id="panel-crypto" class="panel">
+  <div class="card"><h3>Encryption</h3>
+    <label>Plaintext</label><textarea id="ptext" rows="2"></textarea>
+    <label>Associated data (optional)</label><input id="aad">
+    <div class="gap8 mt8"><button class="btn btn-primary btn-sm" onclick="doEncrypt()">Encrypt</button>
+    <button class="btn btn-secondary btn-sm" onclick="doDecrypt()">Decrypt</button></div>
+    <label>Result</label><textarea id="cresult" rows="2" readonly></textarea>
+  </div>
+  <div class="card"><h3>Keystore</h3>
+    <label>Key</label><input id="ksKey"><label>Value</label><input id="ksVal">
+    <div class="gap8 mt8"><button class="btn btn-primary btn-sm" onclick="ksPut()">Save</button>
+    <button class="btn btn-secondary btn-sm" onclick="ksGet()">Get</button>
+    <button class="btn btn-danger btn-sm" onclick="ksDel()">Delete</button></div>
+    <label>Result</label><input id="ksResult" readonly>
+  </div>
+</div>
+<div id="panel-security" class="panel">
+  <div class="card"><h3>App Lock</h3>
+    <div class="row"><span>Biometric lock</span><span class="val" id="lockStatus">disabled</span></div>
+    <button class="btn btn-primary btn-sm" id="lockBtn" onclick="toggleAppLock()">Enable</button>
+    <p style="font-size:11px;color:#8B949E;margin-top:6px">Locks N3 with biometrics when backgrounded</p>
+  </div>
+  <div class="card"><h3>Clipboard</h3>
+    <div class="row"><span>Auto-clear after</span>
+      <select id="clipboardTimerSelect" style="width:auto;font-size:11px;padding:4px" onchange="setClipboardTimer(this.value)">
+        <option value="0">Off</option><option value="15">15s</option><option value="30" selected>30s</option><option value="60">60s</option><option value="120">2m</option>
+      </select>
+    </div>
+    <p style="font-size:11px;color:#8B949E;margin-top:6px">Auto-clears copied sensitive text after set time</p>
+  </div>
+  <div class="card" style="border-color:#3D1F1F"><h3 style="color:#F85149">Panic</h3>
+    <p style="font-size:12px;color:#8B949E;margin-bottom:8px">Destroys all keys, messages, contacts, and identity. Irreversible.</p>
+    <button class="btn btn-danger" onclick="confirmPanic()">PANIC — WIPE ALL DATA</button>
+  </div>
+  <div class="card" id="auditCard"><h3>Audit Log <span id="auditCount" style="color:#8B949E;font-weight:400;font-size:12px"></span></h3>
+    <div class="gap8 mb8">
+      <select id="auditFilter" style="width:auto;font-size:11px;padding:4px" onchange="loadAudit()">
+        <option value="">All events</option>
+        <option value="BOOT">Boot</option>
+        <option value="TOR_CONNECT">Tor</option>
+        <option value="SMP_CONNECT">SMP</option>
+        <option value="MESSAGE_SENT">Sent</option>
+        <option value="MESSAGE_RECEIVED">Received</option>
+        <option value="LOCK">Lock</option>
+        <option value="UNLOCK">Unlock</option>
+        <option value="CONTACT">Contacts</option>
+        <option value="PANIC">Panic</option>
+        <option value="ERROR">Errors</option>
+      </select>
+    </div>
+    <div id="auditList" style="max-height:300px;overflow-y:auto;font-size:11px;font-family:monospace"></div>
+  </div>
+</div>
+<div id="panel-bridge" class="panel">
+  <div class="card"><h3>Bridge Configs</h3>
+    <div id="bridgeList"><p style="color:#8B949E;font-size:13px">No bridge configs</p></div>
+    <div class="gap8 wrap mt8">
+      <button class="btn btn-secondary btn-sm" onclick="addBridge('OPENVPN')">+ OpenVPN</button>
+      <button class="btn btn-secondary btn-sm" onclick="addBridge('WIREGUARD')">+ WireGuard</button>
+      <button class="btn btn-secondary btn-sm" onclick="addBridge('V2RAY')">+ V2Ray</button>
+    </div>
+    <label class="mt8">Import link (vmess/vless/trojan/ss)</label>
+    <div class="gap8"><input id="importLink" placeholder="vmess://..."><button class="btn btn-primary btn-sm" onclick="importBridge()">Import</button></div>
+  </div>
+  <div class="card"><h3>Chain</h3>
+    <div class="row"><span>Active chain</span><span class="val" id="chainStatus">Not assembled</span></div>
+    <div class="gap8 mt8"><button class="btn btn-primary btn-sm" onclick="testAllBridges()">Test All</button>
+    <button class="btn btn-secondary btn-sm" onclick="buildChain()">Build Chain</button></div>
+  </div>
+</div>
+<div id="panel-log" class="panel">
+  <div id="log"></div>
+</div>
+</main>
+<div class="tab-bar">
+  <button class="active" onclick="switchTab('chat',this)">Chat</button>
+  <button onclick="switchTab('contacts',this)">Contacts</button>
+  <button onclick="switchTab('tor',this)">Tor</button>
+  <button onclick="switchTab('crypto',this)">Crypto</button>
+  <button onclick="switchTab('security',this)">Security</button>
+  <button onclick="switchTab('bridge',this)">Bridge</button>
+  <button onclick="switchTab('log',this)">Log</button>
+</div>
+</div>
+
+<!-- Add Contact Modal -->
+<div id="addContactModal" class="overlay" style="display:none"><div class="modal">
+  <h2>Add Contact</h2>
+  <label>Name</label><input id="newContactName">
+  <label>Public Key</label><textarea id="newContactKey" rows="2"></textarea>
+  <label>SMP Address</label><input id="newContactSmp" placeholder="host:port">
+  <div class="gap8 mt8">
+    <button class="btn btn-primary" onclick="saveContact()">Save</button>
+    <button class="btn btn-secondary" onclick="scanContactQr()">Scan QR</button>
+    <button class="btn btn-secondary" onclick="closeModal('addContactModal')">Cancel</button>
+  </div>
+</div></div>
+
+<!-- QR Scanner Overlay -->
+<div id="qrOverlay" class="overlay" style="display:none"><div class="modal" style="text-align:center">
+  <h2>Scan QR Code</h2>
+  <video id="qrVideo" style="width:100%;max-width:320px;border-radius:8px;margin:12px 0" autoplay playsinline></video>
+  <canvas id="qrCanvas" style="display:none"></canvas>
+  <p id="qrStatus" style="font-size:13px;color:#8B949E">Position QR code in frame</p>
+  <button class="btn btn-secondary" onclick="closeQrScanner()">Cancel</button>
+</div></div>
+
+<!-- Lock Overlay -->
+<div id="lockOverlay" class="overlay" style="display:none"><div class="modal" style="text-align:center">
+  <h2>N3 Locked</h2>
+  <p style="margin:16px 0">Authenticate with biometrics to unlock</p>
+  <div style="font-size:48px;margin:16px 0">🔒</div>
+  <button class="btn btn-primary" onclick="checkLocked()">Unlock</button>
+</div></div>
+
+<!-- Profile Overlay -->
+<div id="profileOverlay" class="overlay" style="display:none">
+<div class="modal" id="profileModal">
+  <div id="profileStepCreate">
+    <h2>Identity Setup</h2>
+    <p>Enter 5 words (max 16 chars each) to generate your unique identity seed.</p>
+    <p class="warning">You alone are responsible for your keys. Write down your seed phrase. If lost, your identity is unrecoverable.</p>
+    <div id="wordInputs"></div>
+    <button class="btn btn-primary" onclick="generateSeed()">Generate Seed</button>
+  </div>
+  <div id="profileStepSeed" style="display:none">
+    <h2>Your Seed Phrase</h2>
+    <p>Save these 12 words. You will need them to verify your identity.</p>
+    <div class="warning">Only you are responsible for these keys. Write them down and store securely.</div>
+    <div class="seed-box" id="seedDisplay"></div>
+    <button class="btn btn-primary" onclick="startVerification()">I Saved It — Verify</button>
+  </div>
+  <div id="profileStepVerify" style="display:none">
+    <h2>Verify Seed</h2>
+    <p>Enter the requested words from your seed phrase to confirm you saved it.</p>
+    <div id="verifyInputs"></div>
+    <div id="verifyError" style="color:#F85149;font-size:12px;margin-top:4px"></div>
+    <button class="btn btn-primary" onclick="checkVerification()">Confirm</button>
+  </div>
+  <div id="profileStepBoot" style="display:none">
+    <div class="progress" id="bootProgress">
+      <div class="dot" id="bp0"></div><div class="dot" id="bp1"></div><div class="dot" id="bp2"></div><div class="dot" id="bp3"></div>
+      <div class="boot-msg" id="bootMsg">Initializing...</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script src="app.js"></script>
+</body></html>

@@ -1,0 +1,102 @@
+<resources>
+    <string name="app_name">Not Gammon</string>
+    <string name="app_name_calculator">Calculator</string>
+    <string name="app_name_music">Music Player</string>
+    <string name="app_name_tic">Dots &amp; Boxes</string>
+    <string name="attribution_vpn">Not Gammon Decentralized VPN &amp; SOCKS5 Tunneling</string>
+    <string name="attribution_talkie">Not Gammon Voice Over SimpleX &amp; Tor</string>
+
+    <!-- Secure Chat -->
+    <string name="chat_title">Secure SimpleX Chat</string>
+    <string name="chat_placeholder">Введите сообщение…</string>
+    <string name="chat_send">Отправить</string>
+    <string name="chat_connecting">Подключение…</string>
+    <string name="chat_connected">Подключено</string>
+    <string name="chat_disconnected">Отключено</string>
+    <string name="chat_error">Ошибка соединения</string>
+    <string name="chat_encrypted">E2E шифрование активно</string>
+    <string name="chat_no_contacts">Нет контактов</string>
+    <string name="chat_add_contact">Добавить контакт</string>
+    <string name="chat_create_invite">Создать приглашение</string>
+    <string name="chat_scan_qr">Сканировать QR-код</string>
+    <string name="chat_disappearing">Самоуничтожение:</string>
+    <string name="chat_voice_record">Запись голоса</string>
+    <string name="chat_voice_stop">Остановить запись</string>
+
+    <!-- Network -->
+    <string name="network_title">Настройки сети</string>
+    <string name="network_tor">Tor маршрутизация</string>
+    <string name="network_vpn">VPN туннель</string>
+    <string name="network_bridge_obfs4">OBFS4 мост</string>
+    <string name="network_bridge_meek">Meek мост</string>
+    <string name="network_bridge_snowflake">Snowflake мост</string>
+    <string name="network_test">Тест соединения</string>
+    <string name="network_testing">Тестирование…</string>
+    <string name="network_ping">Пинг: %d мс</string>
+    <string name="network_status_ok">Соединение установлено</string>
+    <string name="network_status_fail">Соединение не удалось</string>
+    <string name="network_server_url">Адрес сервера</string>
+    <string name="network_custom_server">Свой SMP сервер</string>
+
+    <!-- Security -->
+    <string name="security_title">Безопасность</string>
+    <string name="security_pin">PIN-код доступа</string>
+    <string name="security_pin_set">Установить PIN</string>
+    <string name="security_pin_change">Сменить PIN</string>
+    <string name="security_pin_enter">Введите PIN</string>
+    <string name="security_pin_confirm">Подтвердите PIN</string>
+    <string name="security_pin_mismatch">PIN-коды не совпадают</string>
+    <string name="security_pin_wrong">Неверный PIN</string>
+    <string name="security_duress_pin">Duress PIN (экстренный)</string>
+    <string name="security_duress_hint">При вводе этого PIN данные будут стёрты</string>
+    <string name="security_screen">Защита экрана</string>
+    <string name="security_screenshot_block">Блокировка скриншотов</string>
+    <string name="security_clipboard">Защита буфера обмена</string>
+
+    <!-- Profiles -->
+    <string name="profile_title">Профили</string>
+    <string name="profile_create">Создать профиль</string>
+    <string name="profile_delete">Удалить профиль</string>
+    <string name="profile_switch">Переключиться</string>
+    <string name="profile_name">Имя профиля</string>
+    <string name="profile_active">Активен</string>
+    <string name="profile_decoy">Декоративный</string>
+    <string name="profile_confirm_delete">Удалить профиль %s?</string>
+
+    <!-- Groups -->
+    <string name="group_title">Группы</string>
+    <string name="group_create">Создать группу</string>
+    <string name="group_invite">Пригласить</string>
+    <string name="group_leave">Покинуть группу</string>
+    <string name="group_members">Участники</string>
+    <string name="group_name">Название группы</string>
+
+    <!-- General UI -->
+    <string name="dialog_confirm">Подтвердить</string>
+    <string name="dialog_cancel">Отмена</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_close">Закрыть</string>
+    <string name="label_loading">Загрузка…</string>
+    <string name="label_error">Ошибка</string>
+    <string name="label_success">Успешно</string>
+    <string name="label_retry">Повторить</string>
+    <string name="label_exit">Выход</string>
+    <string name="label_back">Назад</string>
+    <string name="label_save">Сохранить</string>
+
+    <!-- Radio -->
+    <string name="radio_title">Радио</string>
+    <string name="radio_volume">Громкость</string>
+    <string name="radio_play">Играть</string>
+    <string name="radio_stop">Стоп</string>
+    <string name="radio_armageddon_unlock">Radio Armageddon FM активирован</string>
+
+    <!-- File Transfer -->
+    <string name="file_send">Отправить файл</string>
+    <string name="file_receive">Получить файл</string>
+    <string name="file_encrypting">Шифрование…</string>
+    <string name="file_uploading">Отправка…</string>
+    <string name="file_downloading">Загрузка…</string>
+    <string name="file_complete">Передача завершена</string>
+    <string name="file_error">Ошибка передачи</string>
+</resources>

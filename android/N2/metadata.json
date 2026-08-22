@@ -1,0 +1,8 @@
+{
+  "name": "Not Gammon",
+  "description": "Not Gammon — decentralized P2P messenger over SOCKS5, Tor, and SimpleX protocol pipelines.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
