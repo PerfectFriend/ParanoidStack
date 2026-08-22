@@ -1,0 +1,36 @@
+# Build artifacts
+*.aar
+*.apk
+*.apks
+build/
+.gradle/
+local.properties
+*.keystore
+*.jks
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Dependencies
+node_modules/
+.gradle/
+vendor/
+
+# Secrets
+*.env
+*.key
+*.pem
+*.p12
+keystore/
+
+# Logs
+*.log
+*.out
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
